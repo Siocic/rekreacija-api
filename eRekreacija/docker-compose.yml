@@ -82,7 +82,7 @@ services:
           - RABBITMQ_VIRTUALHOST=/
           - RABBITMQ_PORT=5672
           - EMAIL_FROM=${EMAIL_FROM}
-          - SMTP_USER=${STMP_USER}
+          - SMTP_USER=${SMTP_USER}
           - SMTP_PASSWORD=${SMTP_PASSWORD}
         depends_on:
               erekreacija-rabbitmq:
