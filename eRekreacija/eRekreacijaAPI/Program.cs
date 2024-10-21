@@ -16,6 +16,8 @@ builder.Services.AddAutoMapper(typeof(IAuthService));
 
 builder.Services.AddControllers();
 
+Console.WriteLine("Conn:", builder.Configuration.GetConnectionString("RekreacijaConnection"));
+
 builder.Services.AddDbContext<IdentityContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("RekreacijaConnection")));
 
