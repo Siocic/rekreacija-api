@@ -41,7 +41,7 @@ services:
 
     #RABBIT_MQ
     erekreacija-rabbitmq:
-        image: rabbitmq:4.0-management-alpine
+        image: rabbitmq:3.8-management-alpine
         hostname: erekreacija-rabbitmq
         restart: unless-stopped
         ports:
