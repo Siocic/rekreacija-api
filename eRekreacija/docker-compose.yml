@@ -35,9 +35,9 @@ services:
         networks:
           - erekreacijanet
         links:
-          - erekreacijanet-sql
+          - erekreacija-sql
         depends_on:
-          - erekreacijanet-sql         
+          - erekreacija-sql         
 
     #RABBIT_MQ
     erekreacija-rabbitmq:
