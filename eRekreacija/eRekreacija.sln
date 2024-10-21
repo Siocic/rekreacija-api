@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35303.130
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eRekreacijaAPI", "eRekreacijaAPI\eRekreacijaAPI.csproj", "{254C58EF-3A0F-4C6F-983A-6C02D29C4D44}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eRekreacija.Models", "eRekreacija.Models\eRekreacija.Models.csproj", "{1AA2C421-672C-4CAE-920B-D8F476498B79}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eRekreacija.Services", "eRekreacija.Services\eRekreacija.Services.csproj", "{0AEC50CE-76A3-4005-8181-17BB5B8DECA8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6D297C8A-4CC4-449A-BAF0-4C9D3FDE176D}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+		Dockerfile = Dockerfile
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegistrationEmailConsumer", "ConsumerEmail\RegistrationEmailConsumer.csproj", "{B04A24E1-45B4-4A99-A2D2-75892C640D0D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{254C58EF-3A0F-4C6F-983A-6C02D29C4D44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{254C58EF-3A0F-4C6F-983A-6C02D29C4D44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{254C58EF-3A0F-4C6F-983A-6C02D29C4D44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{254C58EF-3A0F-4C6F-983A-6C02D29C4D44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AA2C421-672C-4CAE-920B-D8F476498B79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AA2C421-672C-4CAE-920B-D8F476498B79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AA2C421-672C-4CAE-920B-D8F476498B79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AA2C421-672C-4CAE-920B-D8F476498B79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0AEC50CE-76A3-4005-8181-17BB5B8DECA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0AEC50CE-76A3-4005-8181-17BB5B8DECA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0AEC50CE-76A3-4005-8181-17BB5B8DECA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0AEC50CE-76A3-4005-8181-17BB5B8DECA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B04A24E1-45B4-4A99-A2D2-75892C640D0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B04A24E1-45B4-4A99-A2D2-75892C640D0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B04A24E1-45B4-4A99-A2D2-75892C640D0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B04A24E1-45B4-4A99-A2D2-75892C640D0D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CD15F255-FB47-4EFB-BE45-DFA1C6C3882E}
+	EndGlobalSection
+EndGlobal

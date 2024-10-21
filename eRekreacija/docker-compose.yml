@@ -1,0 +1,91 @@
+networks:
+  erekreacijanet:
+    driver: bridge 
+
+services:
+  # mssql docker
+    erekreacija-sql:
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        restart: unless-stopped
+        environment:
+          - ACCEPT_EULA=Y
+          - SA_PASSWORD=${SQL_PASSWORD}
+          - MSSQL_PID=Developer
+        ports:
+          - ${SQL_PORT}:1433
+        expose:
+          - 1433
+        networks:
+          - erekreacijanet
+
+    erekereacija-api:
+        restart: unless-stopped
+        build:
+          context: .
+        environment:
+          - ConnectionStrings:DefaultConnection=Server=${SQL_HOST}, 1433;Database=${SQL_DATABASE};User Id=${SQL_USER};Password=${SQL_PASSWORD};TrustServerCertificate=True
+          - ASPNETCORE_ENVIRONMENT=Development
+          - RABBITMQ_HOST=erekreacija-rabbitmq
+          - RABBITMQ_USERNAME=${RABBITMQ_USER}
+          - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+          - RABBITMQ_VIRTUALHOST=/
+          - RABBITMQ_PORT=5672
+        ports:
+          - 5672:5672
+        networks:
+          - erekreacijanet
+        links:
+          - erekreacijanet-sql
+        depends_on:
+          - erekreacijanet-sql         
+
+    #RABBIT_MQ
+    erekreacija-rabbitmq:
+        image: rabbitmq:4.0-management-alpine
+        hostname: erekreacija-rabbitmq
+        restart: unless-stopped
+        ports:
+          - 5672:5672  
+          - 8080:15672
+          - 15692:15692
+        expose:
+          - 5672
+          - 8080
+        environment:
+          - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER} 
+          - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD} 
+        depends_on:
+          - erekreacija-api
+        networks:
+          - erekreacijanet
+        volumes:
+          - ./docker_data/rabbitmq_data:/var/lib/rabbitmq
+          - ./docker_data/rabbitmq_logs:/var/log/rabbitmq
+        healthcheck:
+          test: ["CMD", "rabbitmqctl", "status"]
+          interval: 30s
+          timeout: 10s
+          retries: 5
+
+    erekreacija-mailservice:
+        restart: unless-stopped
+        container_name: erekreacija-mailservice
+        hostname: erekreacija-mailservice
+        image: registration-email-consumer:latest
+        build: 
+            context: .
+            dockerfile: RegistrationEmailServiceDockerFile
+        environment:
+          - RABBITMQ_HOST=erekreacija-rabbitmq
+          - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER} 
+          - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD} 
+          - RABBITMQ_VIRTUALHOST=/
+          - RABBITMQ_PORT=5672
+          - EMAIL_FROM=${EMAIL_FROM}
+          - SMTP_USER=${STMP_USER}
+          - SMTP_PASSWORD=${SMTP_PASSWORD}
+        depends_on:
+              erekreacija-rabbitmq:
+                condition: service_healthy
+        networks:
+           - erekreacijanet
