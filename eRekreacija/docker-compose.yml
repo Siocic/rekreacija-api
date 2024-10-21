@@ -31,7 +31,7 @@ services:
           - RABBITMQ_VIRTUALHOST=/
           - RABBITMQ_PORT=5672
         ports:
-          - 5672:5672
+          - 7271:7271
         networks:
           - erekreacijanet
         links:
