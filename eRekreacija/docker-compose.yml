@@ -5,6 +5,7 @@ networks:
 services:
   # mssql docker
     erekreacija-sql:
+        container_name: erekreacija-sql
         image: mcr.microsoft.com/mssql/server:2019-latest
         restart: unless-stopped
         environment:
@@ -23,7 +24,7 @@ services:
         build:
           context: .
         environment:
-          - ConnectionStrings:RekreacijaConnection=Server=${SQL_HOST}, 1433;Database=${SQL_DATABASE};User Id=${SQL_USER};Password=${SQL_PASSWORD};TrustServerCertificate=True
+          - ConnectionStrings__RekreacijaConnection=Server=${SQL_HOST}, 1433;Database=${SQL_DATABASE};User Id=${SQL_USER};Password=${SQL_PASSWORD};TrustServerCertificate=True
           - ASPNETCORE_ENVIRONMENT=Development
           - RABBITMQ_HOST=erekreacija-rabbitmq
           - RABBITMQ_USERNAME=${RABBITMQ_USER}
