@@ -27,6 +27,10 @@ namespace EmailConsumer
                 UserName = _username,
                 Password = _password,
             };
+            Console.WriteLine(factory.HostName);
+            Console.WriteLine(factory.UserName);
+            Console.WriteLine(factory.Password);
+
             var connection = factory.CreateConnection();
             _chanel = connection.CreateModel();
         }

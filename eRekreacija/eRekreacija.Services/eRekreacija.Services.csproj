@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\eRekreacija.Models\eRekreacija.Models.csproj" />
-    <ProjectReference Include="..\RegistrationEmailConsumer\RegistrationEmailConsumer.csproj" />
   </ItemGroup>
 
 </Project>

@@ -26,10 +26,10 @@ services:
         environment:
           - ConnectionStrings__RekreacijaConnection=Server=${SQL_HOST}, 1433;Database=${SQL_DATABASE};User Id=${SQL_USER};Password=${SQL_PASSWORD};TrustServerCertificate=True
           - ASPNETCORE_ENVIRONMENT=Development
-          - RABBITMQ_HOST=erekreacija-rabbitmq
-          - RABBITMQ_USERNAME=${RABBITMQ_USER}
-          - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
-          - RABBITMQ_VIRTUALHOST=/
+          - RabbitMQ_Host=erekreacija-rabbitmq
+          - RabbitMQ_Username=${RABBITMQ_USER} 
+          - RabbitMQ_Password=${RABBITMQ_PASSWORD} 
+          - RabbitMQ_Virtualhost=/
           - RABBITMQ_PORT=5672
         ports:
           - 7271:7271
@@ -43,11 +43,12 @@ services:
     #RABBIT_MQ
     erekreacija-rabbitmq:
         image: rabbitmq:3.8-management-alpine
+        container_name: erekreacija-rabbitmq
         hostname: erekreacija-rabbitmq
         restart: unless-stopped
         ports:
           - 5672:5672  
-          - 8080:15672
+          #- 8080:15672
           - 15692:15692
         expose:
           - 5672
@@ -77,14 +78,16 @@ services:
             context: .
             dockerfile: RegistrationEmailServiceDockerFile
         environment:
-          - RABBITMQ_HOST=erekreacija-rabbitmq
-          - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER} 
-          - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD} 
-          - RABBITMQ_VIRTUALHOST=/
+          - RabbitMQ_Host=erekreacija-rabbitmq
+          - RabbitMQ_Username=${RABBITMQ_USER} 
+          - RabbitMQ_Password=${RABBITMQ_PASSWORD} 
+          - RabbitMQ_Virtualhost=/
           - RABBITMQ_PORT=5672
           - EMAIL_FROM=${EMAIL_FROM}
           - SMTP_USER=${SMTP_USER}
           - SMTP_PASSWORD=${SMTP_PASSWORD}
+        # volumes:
+        #     - ./appsettings.json:/app/appsettings.json
         depends_on:
               erekreacija-rabbitmq:
                 condition: service_healthy

@@ -19,10 +19,10 @@ namespace eRekreacija.Services.Services
         private readonly SignInManager<User> _signInManager;
         private readonly IMapper _mapper;
         private readonly IModel _channel;
-        private readonly string _host = "localhost";
-        private readonly string _username = "guest";
-        private readonly string _password = "guest";
-        private readonly string _virtualhost = "/";
+        private readonly string _host = Environment.GetEnvironmentVariable("RabbitMQ_Host") ?? "localhost";
+        private readonly string _username = Environment.GetEnvironmentVariable("RabbitMQ_Username") ?? "guest";
+        private readonly string _password = Environment.GetEnvironmentVariable("RabbitMQ_Password") ?? "guest";
+        private readonly string _virtualhost = Environment.GetEnvironmentVariable("RabbitMQ_Virtualhost") ?? "/";
 
         public AuthService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager,IMapper mapper,SignInManager<User>signInManager)
         {
