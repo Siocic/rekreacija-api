@@ -83,9 +83,11 @@ services:
           - RabbitMQ_Password=${RABBITMQ_PASSWORD} 
           - RabbitMQ_Virtualhost=/
           - RABBITMQ_PORT=5672
-          - EMAIL_FROM=${EMAIL_FROM}
-          - SMTP_USER=${SMTP_USER}
-          - SMTP_PASSWORD=${SMTP_PASSWORD}
+          - Email=${EMAIL_FROM}
+          - EmailUsername=${SMTP_USER}
+          - Password=${SMTP_PASSWORD}
+          - Port=${SMTP_PORT} 
+          - Host=${SMTP_HOST}
         # volumes:
         #     - ./appsettings.json:/app/appsettings.json
         depends_on:
