@@ -8,7 +8,7 @@ namespace eRekreacija.Services.Interfaces
     {
         Task<IdentityResult> RegisterUser(RegisterRequest request);
         Task<SignInResult> LoginAsync(string email, string password);
-        Task<IEnumerable<User>> GetAllUsersAsync();
+        Task<IEnumerable<ApplicationUser>> GetAllUsersAsync();
         Task<IEnumerable<IdentityRole>> GetAllRolesAsync();
 
     }

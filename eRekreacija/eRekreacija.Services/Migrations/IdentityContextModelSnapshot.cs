@@ -48,26 +48,6 @@ namespace eRekreacija.Services.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("Role", "Identity");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "d438d6a0-4d3a-4a02-80ad-b246077b4ebf",
-                            Name = "SuperAdmin",
-                            NormalizedName = "SUPERADMIN"
-                        },
-                        new
-                        {
-                            Id = "078d57d5-e118-4d2a-b785-8bd492b7a975",
-                            Name = "FizickoLice",
-                            NormalizedName = "FIZICKOLICE"
-                        },
-                        new
-                        {
-                            Id = "ed099874-5606-4398-a1e9-00452334553a",
-                            Name = "PravnoLice",
-                            NormalizedName = "PRAVNOLICE"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -109,8 +89,8 @@ namespace eRekreacija.Services.Migrations
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
+                        .HasMaxLength(21)
+                        .HasColumnType("nvarchar(21)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -250,7 +230,7 @@ namespace eRekreacija.Services.Migrations
                     b.ToTable("UserTokens", "Identity");
                 });
 
-            modelBuilder.Entity("eRekreacija.Services.Database.User", b =>
+            modelBuilder.Entity("eRekreacija.Services.Database.ApplicationUser", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
@@ -266,7 +246,10 @@ namespace eRekreacija.Services.Migrations
                     b.Property<byte[]>("ProfilePicutre")
                         .HasColumnType("varbinary(max)");
 
-                    b.HasDiscriminator().HasValue("User");
+                    b.Property<bool?>("isApproved")
+                        .HasColumnType("bit");
+
+                    b.HasDiscriminator().HasValue("ApplicationUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

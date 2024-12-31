@@ -13,7 +13,7 @@ namespace eRekreacija.Services.Database.Context
     {
         public IdentityContext(DbContextOptions<IdentityContext>options):base(options) { }
         
-            public DbSet<User> User {  get; set; }
+            public DbSet<ApplicationUser> User {  get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -45,13 +45,7 @@ namespace eRekreacija.Services.Database.Context
             builder.Entity<IdentityUserToken<string>>(entity =>
             {
                 entity.ToTable("UserTokens");
-            });
-            builder.Entity<IdentityRole>().HasData(
-                new IdentityRole { Name=enums.Roles.SuperAdmin.ToString(),NormalizedName=enums.Roles.SuperAdmin.ToString().ToUpper() },
-               new IdentityRole { Name = enums.Roles.FizickoLice.ToString(), NormalizedName = enums.Roles.FizickoLice.ToString().ToUpper() },
-               new IdentityRole { Name = enums.Roles.PravnoLice.ToString(), NormalizedName = enums.Roles.PravnoLice.ToString().ToUpper() }
-               );
+            });      
         }
-
     }
 }

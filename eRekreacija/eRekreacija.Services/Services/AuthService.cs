@@ -14,9 +14,9 @@ namespace eRekreacija.Services.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly SignInManager<User> _signInManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IMapper _mapper;
         private readonly IModel _channel;
         private readonly string _host = Environment.GetEnvironmentVariable("RabbitMQ_Host") ?? "localhost";
@@ -24,7 +24,7 @@ namespace eRekreacija.Services.Services
         private readonly string _password = Environment.GetEnvironmentVariable("RabbitMQ_Password") ?? "guest";
         private readonly string _virtualhost = Environment.GetEnvironmentVariable("RabbitMQ_Virtualhost") ?? "/";
 
-        public AuthService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager,IMapper mapper,SignInManager<User>signInManager)
+        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,IMapper mapper,SignInManager<ApplicationUser>signInManager)
         {
             _roleManager = roleManager;
             _userManager = userManager;
@@ -49,7 +49,7 @@ namespace eRekreacija.Services.Services
         public async Task<IdentityResult> RegisterUser(RegisterRequest request)
         {
             //var user = _mapper.Map<User>(request);
-            var user = new User
+            var user = new ApplicationUser
             {
                 FirstName = request.FirstName,
                 LastName = request.LastName,
@@ -75,7 +75,7 @@ namespace eRekreacija.Services.Services
 
             return await _signInManager.PasswordSignInAsync(user, password, false, false);
         }
-        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync()
         {
             return await _userManager.Users.ToListAsync();
         }

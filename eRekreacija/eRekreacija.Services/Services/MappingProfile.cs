@@ -1,9 +1,6 @@
 ﻿using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using eRekreacija.Services.Database;
+using eRekreacija.Models.Models;
 
 namespace eRekreacija.Services.Services
 {
@@ -11,8 +8,8 @@ namespace eRekreacija.Services.Services
     {
         public MappingProfile()
         {
-            CreateMap<Database.User, Models.Models.RegisterRequest>();
-            CreateMap<Models.Models.RegisterRequest, Database.User>();
+            CreateMap<ApplicationUser, RegisterRequest>();
+            CreateMap<RegisterRequest, ApplicationUser>();
         }
     }
 }
