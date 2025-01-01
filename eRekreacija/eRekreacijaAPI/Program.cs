@@ -35,11 +35,12 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var rekreacijContext = scope.ServiceProvider.GetRequiredService<RekreacijaContext>();
     try
     {
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-        await DatabaseSeeder.SeedAsync(userManager, roleManager);
+        await DatabaseSeeder.SeedAsync(userManager, roleManager,rekreacijContext);
     }
     catch (Exception ex)
     {
