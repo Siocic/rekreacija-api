@@ -11,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ISportCategoryService, SportCategoryService>();
+
 
 builder.Services.AddAutoMapper(typeof(IAuthService));
 
