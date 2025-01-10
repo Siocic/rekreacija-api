@@ -1,5 +1,5 @@
 ﻿using eRekreacija.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eRekreacijaAPI.Controllers
@@ -12,18 +12,23 @@ namespace eRekreacijaAPI.Controllers
 
         public BaseCRUDController(ICRUDService<TModelDTO, TInsert, TUpdate> crudService) : base(crudService) { }
 
+        [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpPost("Insert")]
         public IActionResult Insert([FromBody] TInsert model)
         {
             var result = _crudService.Insert(model);
             return Ok();
         }
+
+        [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpPut("Update/{id}")]
         public IActionResult Update(int id, [FromBody] TUpdate model)
         {
             var result = _crudService.Update(id, model);
             return Ok();
         }
+
+        [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpDelete("Delete/{id}")]
         public IActionResult Delete(int id)
         {
@@ -37,6 +42,5 @@ namespace eRekreacijaAPI.Controllers
                 return NotFound(ex.Message);
             }
         }
-
     }
 }

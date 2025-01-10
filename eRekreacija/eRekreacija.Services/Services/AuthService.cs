@@ -6,8 +6,8 @@ using eRekreacija.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
+using Newtonsoft.Json;
 using System.Text;
-using System.Threading.Channels;
 
 
 namespace eRekreacija.Services.Services
@@ -24,7 +24,7 @@ namespace eRekreacija.Services.Services
         private readonly string _password = Environment.GetEnvironmentVariable("RabbitMQ_Password") ?? "guest";
         private readonly string _virtualhost = Environment.GetEnvironmentVariable("RabbitMQ_Virtualhost") ?? "/";
 
-        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,IMapper mapper,SignInManager<ApplicationUser>signInManager)
+        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IMapper mapper, SignInManager<ApplicationUser> signInManager)
         {
             _roleManager = roleManager;
             _userManager = userManager;
@@ -46,9 +46,8 @@ namespace eRekreacija.Services.Services
                                  arguments: null);
 
         }
-        public async Task<IdentityResult> RegisterUser(RegisterRequest request)
+        public async Task<IdentityResult> RegisterUser(RegisterRequest request, int flag)
         {
-            //var user = _mapper.Map<User>(request);
             var user = new ApplicationUser
             {
                 FirstName = request.FirstName,
@@ -57,23 +56,59 @@ namespace eRekreacija.Services.Services
                 UserName = request.Email,
                 Address = request.Address,
             };
-            var result = await _userManager.CreateAsync(user, request.Password);
-            if (result.Succeeded)
-            {
-                await _userManager.AddToRoleAsync(user, Roles.FizickoLice.ToString());
-            }
-            var userEmail=$"Registration created for {request.Email}";
-            var body=Encoding.UTF8.GetBytes(userEmail);
-            _channel.BasicPublish(exchange: "", routingKey: "registrationQueue", basicProperties: null,body:body);
-            return result;
-        }
-        public async Task<SignInResult> LoginAsync(string email, string password)
-        {
-            var user=await _userManager.FindByEmailAsync(email);
-            if (user == null) 
-                return SignInResult.Failed;
 
-            return await _signInManager.PasswordSignInAsync(user, password, false, false);
+            if (flag != 0)
+            {
+                user.isApproved = false;
+            }
+
+            var result = await _userManager.CreateAsync(user, request.Password);
+            if (!result.Succeeded)
+            {
+                return null;
+            }
+
+            string role=flag==0?Roles.FizickoLice.ToString() :Roles.PravnoLice.ToString();
+            await _userManager.CreateAsync(user, role);
+
+            string userEmailMessages;
+            if(flag==0)
+            {
+                userEmailMessages = "Welcome to Rekreacija! We're excited to have you on board and hope you love using our app!";
+            }
+            else
+            {
+                userEmailMessages = "Welcome to AppName! Your registration is successful. Please wait for admin approval. We’ll notify you once it’s done!";
+            }
+
+            var message = new
+            {
+                Email = user.Email,
+                Message = userEmailMessages
+            };
+
+            var messageJson = JsonConvert.SerializeObject(message);
+
+            var body = Encoding.UTF8.GetBytes(messageJson);
+           
+            _channel.BasicPublish(exchange: "", routingKey: "registrationQueue", basicProperties: null, body: body);
+            return result;           
+        }
+        public async Task<string> LoginAsync(string email, string password)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                return null;
+
+            var singInResult = await _signInManager.PasswordSignInAsync(user, password, false, false);
+            if (!singInResult.Succeeded)
+                return null;
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var role = roles.FirstOrDefault() ?? " ";
+
+            var token = GenerateJWTToken.JWTTokenGenerate(user.Email, user.FirstName, user.LastName, role);
+            return token;
         }
         public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync()
         {

@@ -1,5 +1,6 @@
 ﻿using eRekreacija.Models.Models;
 using eRekreacija.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eRekreacijaAPI.Controllers
@@ -13,45 +14,49 @@ namespace eRekreacijaAPI.Controllers
         {
             _authService = authService;
         }
+        [AllowAnonymous]
         [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request, int flag)
         {
             if (request == null)
                 return BadRequest();
 
-            var result=await _authService.RegisterUser(request);
+            var result = await _authService.RegisterUser(request, flag);
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
 
-            return Ok(new {Message= "User registered successfully" });           
+            return Ok(new { Message = "User registered successfully" });
         }
 
+        [AllowAnonymous]
         [HttpPost("Login")]
-        public async Task<IActionResult> Login([FromBody]LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            if(request == null)
+            if (request == null)
                 return BadRequest();
-            
-            var result=await _authService.LoginAsync(request.Email, request.Password);
-            if(!result.Succeeded)
+
+            var result = await _authService.LoginAsync(request.Email, request.Password);
+            if (string.IsNullOrEmpty(result))
                 return Unauthorized("Invalid email or password");
 
-            return Ok(new { Message="Login successful"});
+            return Ok(new { Message = "Login successful", Token = result });
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpGet("getAllUser")]
-        public async Task<IActionResult>GetAllUsers()
+        public async Task<IActionResult> GetAllUsers()
         {
-            var result= await _authService.GetAllUsersAsync();
-            if(result==null)
+            var result = await _authService.GetAllUsersAsync();
+            if (result == null)
                 return NotFound("We dont have any users yet");
             return Ok(result);
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpGet("getAllRoles")]
         public async Task<IActionResult> GetAllRoles()
         {
-            var result=await _authService.GetAllRolesAsync();
+            var result = await _authService.GetAllRolesAsync();
             if (result == null)
                 return NotFound("No roles found");
             return Ok(result);

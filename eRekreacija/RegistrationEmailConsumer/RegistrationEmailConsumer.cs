@@ -2,6 +2,7 @@
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace EmailConsumer
 {
@@ -11,7 +12,7 @@ namespace EmailConsumer
         private readonly IConfiguration _configuration;
         private readonly EmailService _emailService;
 
-        private readonly string _host = Environment.GetEnvironmentVariable("RabbitMQ_Host")??"localhost";
+        private readonly string _host = Environment.GetEnvironmentVariable("RabbitMQ_Host") ?? "localhost";
         private readonly string _username = Environment.GetEnvironmentVariable("RabbitMQ_Username") ?? "guest";
         private readonly string _password = Environment.GetEnvironmentVariable("RabbitMQ_Password") ?? "guest";
         private readonly string _virtualhost = Environment.GetEnvironmentVariable("RabbitMQ_Virtualhost") ?? "/";
@@ -27,7 +28,7 @@ namespace EmailConsumer
                 UserName = _username,
                 Password = _password,
             };
-           
+
             var connection = factory.CreateConnection();
             _chanel = connection.CreateModel();
         }
@@ -44,22 +45,20 @@ namespace EmailConsumer
             consumer.Received += (model, ea) =>
             {
                 var body = ea.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
-                Console.WriteLine(" [x] Received {0}", message);
-                var email = ExtractEmailFromMessage(message);
-                if (!string.IsNullOrEmpty(email))
+                var messageJson = Encoding.UTF8.GetString(body);
+                Console.WriteLine(" [x] Received {0}", messageJson);
+                var message = JsonConvert.DeserializeObject<dynamic>(messageJson);
+                var email = message?.Email?.ToString();
+                var messageContent = message?.Message?.ToString();
+
+                if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(messageContent))
                 {
-                    _emailService.SendEmailForRegistration(email, "You are successfully register to Rekreacija application");
+                    _emailService.SendEmailForRegistration(email, messageContent);
                 }
             };
             _chanel.BasicConsume(queue: _configuration["RabbitMQ:QueueName"],
                              autoAck: true,
                              consumer: consumer);
-        }
-        private string ExtractEmailFromMessage(string message)
-        {
-            var parts = message.Split(' ');
-            return parts.Length > 3 ? parts[3] : string.Empty;
-        }
+        }        
     }
 }

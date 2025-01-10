@@ -1,6 +1,5 @@
 ﻿using eRekreacija.Models.DTOs;
 using eRekreacija.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eRekreacijaAPI.Controllers

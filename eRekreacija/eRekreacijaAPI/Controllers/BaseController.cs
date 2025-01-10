@@ -1,4 +1,5 @@
 ﻿using eRekreacija.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eRekreacijaAPI.Controllers
@@ -12,16 +13,19 @@ namespace eRekreacijaAPI.Controllers
         {
             _service = service;
         }
+
+        [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpGet("GetAll")]
         public IActionResult Get()
         {
-            var reuslt= _service.Get();
+            var reuslt = _service.Get();
             return Ok(reuslt);
         }
+        [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpGet("GetById/{id}")]
-        public IActionResult GetById(int id) 
+        public IActionResult GetById(int id)
         {
-            var result= _service.GetById(id);
+            var result = _service.GetById(id);
             if (result == null)
             {
                 return NotFound($"Entity with ID {id} not found");
