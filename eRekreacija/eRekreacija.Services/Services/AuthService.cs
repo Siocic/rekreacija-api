@@ -69,7 +69,7 @@ namespace eRekreacija.Services.Services
             }
 
             string role=flag==0?Roles.FizickoLice.ToString() :Roles.PravnoLice.ToString();
-            await _userManager.CreateAsync(user, role);
+            await _userManager.AddToRoleAsync(user, role);
 
             string userEmailMessages;
             if(flag==0)
