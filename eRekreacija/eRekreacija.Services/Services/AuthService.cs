@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using Newtonsoft.Json;
 using System.Text;
+using Azure.Messaging;
 
 
 namespace eRekreacija.Services.Services
@@ -48,6 +49,16 @@ namespace eRekreacija.Services.Services
         }
         public async Task<IdentityResult> RegisterUser(RegisterRequest request, int flag)
         {
+
+            var checkIfUserExist = await _userManager.FindByEmailAsync(request.Email);
+            if (checkIfUserExist != null)
+            {
+                return IdentityResult.Failed(new IdentityError
+                {
+                    Code = "UserAlready",
+                    Description = "This user already exists. Please try with a different email."
+                });
+            }
             var user = new ApplicationUser
             {
                 FirstName = request.FirstName,
@@ -55,6 +66,7 @@ namespace eRekreacija.Services.Services
                 Email = request.Email,
                 UserName = request.Email,
                 Address = request.Address,
+                City = request.City,
             };
 
             if (flag != 0)
@@ -65,14 +77,14 @@ namespace eRekreacija.Services.Services
             var result = await _userManager.CreateAsync(user, request.Password);
             if (!result.Succeeded)
             {
-                return null;
+                return IdentityResult.Failed(result.Errors.ToArray());
             }
 
-            string role=flag==0?Roles.FizickoLice.ToString() :Roles.PravnoLice.ToString();
+            string role = flag == 0 ? Roles.FizickoLice.ToString() : Roles.PravnoLice.ToString();
             await _userManager.AddToRoleAsync(user, role);
 
             string userEmailMessages;
-            if(flag==0)
+            if (flag == 0)
             {
                 userEmailMessages = "Welcome to Rekreacija! We're excited to have you on board and hope you love using our app!";
             }
@@ -90,9 +102,9 @@ namespace eRekreacija.Services.Services
             var messageJson = JsonConvert.SerializeObject(message);
 
             var body = Encoding.UTF8.GetBytes(messageJson);
-           
+
             _channel.BasicPublish(exchange: "", routingKey: "registrationQueue", basicProperties: null, body: body);
-            return result;           
+            return result;
         }
         public async Task<string> LoginAsync(string email, string password)
         {

@@ -16,14 +16,17 @@ namespace eRekreacijaAPI.Controllers
         }
         [AllowAnonymous]
         [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request, int flag)
+        public async Task<IActionResult> Register([FromBody] RegisterRequest? request, int flag)
         {
             if (request == null)
-                return BadRequest();
+                return BadRequest(new { Message = "Invalid request data" });
 
             var result = await _authService.RegisterUser(request, flag);
             if (!result.Succeeded)
-                return BadRequest(result.Errors);
+            {
+                var errorMessages = string.Join(", ", result.Errors.Select(e => e.Description));
+                return BadRequest(new { Message = $"Registration failed. {errorMessages}" });
+            }
 
             return Ok(new { Message = "User registered successfully" });
         }

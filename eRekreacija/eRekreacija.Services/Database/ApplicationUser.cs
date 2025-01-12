@@ -6,7 +6,8 @@ namespace eRekreacija.Services.Database
     {
         public string? FirstName {  get; set; }
         public string? LastName { get; set; }
-        public string? Address {  get; set; }   
+        public string? Address {  get; set; }
+        public string? City { get; set; }
         public bool? isApproved { get; set; }=null;
         public byte[]? ProfilePicutre { get; set; }
     }
