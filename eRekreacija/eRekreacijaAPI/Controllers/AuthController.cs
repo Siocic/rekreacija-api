@@ -36,11 +36,11 @@ namespace eRekreacijaAPI.Controllers
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             if (request == null)
-                return BadRequest();
+                return BadRequest(new { Message = "Invalid request data" });
 
             var result = await _authService.LoginAsync(request.Email, request.Password);
-            if (string.IsNullOrEmpty(result))
-                return Unauthorized("Invalid email or password");
+            if (string.IsNullOrEmpty(result) || result=="User not found")
+                return BadRequest(new {Message="Invalid email or password"});
 
             return Ok(new { Message = "Login successful", Token = result });
         }

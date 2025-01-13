@@ -110,7 +110,7 @@ namespace eRekreacija.Services.Services
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
-                return null;
+                return "User not found";
 
             var singInResult = await _signInManager.PasswordSignInAsync(user, password, false, false);
             if (!singInResult.Succeeded)

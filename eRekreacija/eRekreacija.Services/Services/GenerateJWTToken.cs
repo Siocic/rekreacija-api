@@ -25,7 +25,7 @@ namespace eRekreacija.Services.Services
                 issuer: "mydomain.com",
                 audience: "mydomain.com",
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(60),
+                expires: DateTime.UtcNow.AddMinutes(20),
                 signingCredentials: creds
              );
 
