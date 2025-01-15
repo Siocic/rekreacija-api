@@ -119,7 +119,7 @@ namespace eRekreacija.Services.Services
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault() ?? " ";
 
-            var token = GenerateJWTToken.JWTTokenGenerate(user.Email, user.FirstName, user.LastName, role);
+            var token = GenerateJWTToken.JWTTokenGenerate(user, role);
             return token;
         }
         public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync()
