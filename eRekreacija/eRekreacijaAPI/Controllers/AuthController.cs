@@ -2,6 +2,7 @@
 using eRekreacija.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace eRekreacijaAPI.Controllers
 {
@@ -62,6 +63,20 @@ namespace eRekreacijaAPI.Controllers
             var result = await _authService.GetAllRolesAsync();
             if (result == null)
                 return NotFound("No roles found");
+            return Ok(result);
+        }
+
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpGet("getUser")]
+        public async Task<IActionResult>GetUser()
+        {
+            var userId=User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var result = await _authService.GetUser(userId);
+            if (result == null)
+                return NotFound();
             return Ok(result);
         }
     }

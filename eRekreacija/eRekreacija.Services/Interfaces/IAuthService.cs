@@ -1,4 +1,5 @@
-﻿using eRekreacija.Models.Models;
+﻿using eRekreacija.Models.DTOs;
+using eRekreacija.Models.Models;
 using eRekreacija.Services.Database;
 using Microsoft.AspNetCore.Identity;
 
@@ -10,6 +11,7 @@ namespace eRekreacija.Services.Interfaces
         Task<string> LoginAsync(string email, string password);
         Task<IEnumerable<ApplicationUser>> GetAllUsersAsync();
         Task<IEnumerable<IdentityRole>> GetAllRolesAsync();
+        Task<ApplicationUserDTO> GetUser(string userId);
 
     }
 }

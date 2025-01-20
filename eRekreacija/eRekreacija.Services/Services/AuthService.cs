@@ -9,6 +9,8 @@ using RabbitMQ.Client;
 using Newtonsoft.Json;
 using System.Text;
 using Azure.Messaging;
+using System.Security.Claims;
+using eRekreacija.Models.DTOs;
 
 
 namespace eRekreacija.Services.Services
@@ -121,6 +123,22 @@ namespace eRekreacija.Services.Services
 
             var token = GenerateJWTToken.JWTTokenGenerate(user, role);
             return token;
+        }
+        public async Task<ApplicationUserDTO> GetUser(string userId)
+        {
+            var user = _userManager.FindByIdAsync(userId);
+            var profile = new ApplicationUserDTO
+            {
+                FirstName = user.Result.FirstName,
+                LastName = user.Result.LastName,
+                Email = user.Result.Email,
+                Address = user.Result.Address,
+                City = user.Result.City,
+                PhoneNumber = user.Result.PhoneNumber,
+                ProfilePicture = user.Result.ProfilePicutre,
+            };
+
+            return profile;
         }
         public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync()
         {
