@@ -1,4 +1,5 @@
-﻿using eRekreacija.Models.Models;
+﻿using eRekreacija.Models.DTOs;
+using eRekreacija.Models.Models;
 using eRekreacija.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -78,6 +79,18 @@ namespace eRekreacijaAPI.Controllers
             if (result == null)
                 return NotFound();
             return Ok(result);
+        }
+
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpPost("editUser")]
+        public async Task<IActionResult> EditProfile([FromBody]ApplicationUserDTO model)
+        {
+            if (model == null)
+                return BadRequest();
+
+            var result = await _authService.EditProfile(model);
+
+            return Ok();
         }
     }
 }

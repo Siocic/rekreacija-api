@@ -12,6 +12,6 @@ namespace eRekreacija.Services.Interfaces
         Task<IEnumerable<ApplicationUser>> GetAllUsersAsync();
         Task<IEnumerable<IdentityRole>> GetAllRolesAsync();
         Task<ApplicationUserDTO> GetUser(string userId);
-
+        Task<bool> EditProfile(ApplicationUserDTO model);
     }
 }

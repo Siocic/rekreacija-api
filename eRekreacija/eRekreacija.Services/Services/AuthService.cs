@@ -11,6 +11,9 @@ using System.Text;
 using Azure.Messaging;
 using System.Security.Claims;
 using eRekreacija.Models.DTOs;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using eRekreacija.Services.Database.Context;
 
 
 namespace eRekreacija.Services.Services
@@ -26,6 +29,7 @@ namespace eRekreacija.Services.Services
         private readonly string _username = Environment.GetEnvironmentVariable("RabbitMQ_Username") ?? "guest";
         private readonly string _password = Environment.GetEnvironmentVariable("RabbitMQ_Password") ?? "guest";
         private readonly string _virtualhost = Environment.GetEnvironmentVariable("RabbitMQ_Virtualhost") ?? "/";
+        protected readonly IdentityContext _identityContext;
 
         public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IMapper mapper, SignInManager<ApplicationUser> signInManager)
         {
@@ -135,10 +139,31 @@ namespace eRekreacija.Services.Services
                 Address = user.Result.Address,
                 City = user.Result.City,
                 PhoneNumber = user.Result.PhoneNumber,
-                ProfilePicture = user.Result.ProfilePicutre,
+                ProfilePicture = user.Result.ProfilePicutre != null
+                                    ? Convert.ToBase64String(user.Result.ProfilePicutre)
+                                    : null,
             };
 
             return profile;
+        }
+        public async Task<bool> EditProfile(ApplicationUserDTO model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email); // Retrieve existing user
+            if (user == null)
+                return false;
+
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.Email = model.Email;
+            user.Address = model.Address;
+            user.City = model.City;
+            user.PhoneNumber = model.PhoneNumber;
+            if (!string.IsNullOrEmpty(model.ProfilePicture))
+            {
+                user.ProfilePicutre = Convert.FromBase64String(model.ProfilePicture);
+            }
+            var result = await _userManager.UpdateAsync(user); 
+            return result.Succeeded;
         }
         public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync()
         {
