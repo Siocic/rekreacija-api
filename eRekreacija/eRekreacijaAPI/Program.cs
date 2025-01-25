@@ -14,10 +14,6 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<ISportCategoryService, SportCategoryService>();
-
-builder.Services.AddAutoMapper(typeof(IAuthService));
 
 builder.Services.AddControllers();
 
@@ -26,6 +22,11 @@ builder.Services.AddDbContext<IdentityContext>(options =>
 
 builder.Services.AddDbContext<RekreacijaContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("RekreacijaConnection")));
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<IdentityContext>()
+    .AddDefaultTokenProviders();
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -89,8 +90,10 @@ builder.Services.AddSwaggerGen(options =>
     options.AddSecurityRequirement(securityRequirment);
 });
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<IdentityContext>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ISportCategoryService, SportCategoryService>();
+
+builder.Services.AddAutoMapper(typeof(IAuthService));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

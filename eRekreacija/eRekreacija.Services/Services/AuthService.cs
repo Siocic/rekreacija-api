@@ -14,15 +14,19 @@ using eRekreacija.Models.DTOs;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using eRekreacija.Services.Database.Context;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace eRekreacija.Services.Services
 {
     public class AuthService : IAuthService
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+
         private readonly IMapper _mapper;
         private readonly IModel _channel;
         private readonly string _host = Environment.GetEnvironmentVariable("RabbitMQ_Host") ?? "localhost";
@@ -31,12 +35,13 @@ namespace eRekreacija.Services.Services
         private readonly string _virtualhost = Environment.GetEnvironmentVariable("RabbitMQ_Virtualhost") ?? "/";
         protected readonly IdentityContext _identityContext;
 
-        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IMapper mapper, SignInManager<ApplicationUser> signInManager)
+        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IMapper mapper, SignInManager<ApplicationUser> signInManager, IServiceProvider serviceProvider)
         {
             _roleManager = roleManager;
             _userManager = userManager;
             _mapper = mapper;
             _signInManager = signInManager;
+            _serviceProvider = serviceProvider;
 
             var factory = new ConnectionFactory
             {
@@ -148,7 +153,7 @@ namespace eRekreacija.Services.Services
         }
         public async Task<bool> EditProfile(ApplicationUserDTO model)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email); // Retrieve existing user
+            var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
                 return false;
 
@@ -162,7 +167,7 @@ namespace eRekreacija.Services.Services
             {
                 user.ProfilePicutre = Convert.FromBase64String(model.ProfilePicture);
             }
-            var result = await _userManager.UpdateAsync(user); 
+            var result = await _userManager.UpdateAsync(user);
             return result.Succeeded;
         }
         public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync()
@@ -172,6 +177,28 @@ namespace eRekreacija.Services.Services
         public async Task<IEnumerable<IdentityRole>> GetAllRolesAsync()
         {
             return await _roleManager.Roles.ToListAsync();
+        }
+     
+        public async Task<int> ChangePassword(ChangePasswordDTO model, string userId)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+                var user = await userManager.FindByIdAsync(userId);
+                if (user == null)
+                    return 0;
+
+                var isValidPassword = await userManager.CheckPasswordAsync(user, model.CurrentPassword);
+                if (!isValidPassword)
+                    return -1;
+
+                var result = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+                if (!result.Succeeded)
+                    return -1;
+
+                return 1;
+            }
         }
     }
 }

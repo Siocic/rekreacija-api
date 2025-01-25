@@ -1,7 +1,9 @@
 ﻿using eRekreacija.Models.DTOs;
 using eRekreacija.Models.Models;
+using eRekreacija.Services.Database;
 using eRekreacija.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -12,9 +14,15 @@ namespace eRekreacijaAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        public AuthController(IAuthService authService)
+        private readonly ILogger<AuthController> _logger;
+        private readonly UserManager<ApplicationUser> _userManager;
+
+
+        public AuthController(IAuthService authService, ILogger<AuthController> logger,UserManager<ApplicationUser>userManager)
         {
             _authService = authService;
+            _logger = logger;
+            _userManager = userManager;
         }
         [AllowAnonymous]
         [HttpPost("Register")]
@@ -41,8 +49,8 @@ namespace eRekreacijaAPI.Controllers
                 return BadRequest(new { Message = "Invalid request data" });
 
             var result = await _authService.LoginAsync(request.Email, request.Password);
-            if (string.IsNullOrEmpty(result) || result=="User not found")
-                return BadRequest(new {Message="Invalid email or password"});
+            if (string.IsNullOrEmpty(result) || result == "User not found")
+                return BadRequest(new { Message = "Invalid email or password" });
 
             return Ok(new { Message = "Login successful", Token = result });
         }
@@ -69,9 +77,9 @@ namespace eRekreacijaAPI.Controllers
 
         [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpGet("getUser")]
-        public async Task<IActionResult>GetUser()
+        public async Task<IActionResult> GetUser()
         {
-            var userId=User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
                 return Unauthorized();
 
@@ -83,7 +91,7 @@ namespace eRekreacijaAPI.Controllers
 
         [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpPost("editUser")]
-        public async Task<IActionResult> EditProfile([FromBody]ApplicationUserDTO model)
+        public async Task<IActionResult> EditProfile([FromBody] ApplicationUserDTO model)
         {
             if (model == null)
                 return BadRequest();
@@ -91,6 +99,36 @@ namespace eRekreacijaAPI.Controllers
             var result = await _authService.EditProfile(model);
 
             return Ok();
+        }
+
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpPost("change")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO model)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            if (model == null)
+                return BadRequest(new { Message = "The form is invalid" });
+
+            try
+            {
+                var result = await _authService.ChangePassword(model, userId);
+                if (result == 0)
+                    return BadRequest(new { Message = "User not found" });
+                else if (result == -1)
+                    return BadRequest(new { Message = "Incorrect current password" });
+                else if (result == -2)
+                    return BadRequest(new { Message = "Failed to change password" });
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, ex.InnerException?.Message, ex.Message);
+                return BadRequest();
+            }
         }
     }
 }
