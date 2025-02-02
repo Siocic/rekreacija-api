@@ -10,11 +10,18 @@ namespace eRekreacija.Services.Services
     {
         public BaseCRUDService(RekreacijaContext rekreacijaContext, IMapper mapper) : base(rekreacijaContext, mapper) { }
 
-        public virtual TModelDTO Insert(TInsert model)
+        public virtual async Task BeforeInsert(TModel db, TInsert insert)
+        {
+
+        }
+
+        public virtual async Task<TModelDTO> Insert(TInsert model)
         {
             var entity = _mapper.Map<TModel>(model);
             _rekreacijaContext.Set<TModel>().Add(entity);
+
             _rekreacijaContext.SaveChanges();
+            await BeforeInsert(entity, model);
 
             return _mapper.Map<TModelDTO>(entity);
         }

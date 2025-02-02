@@ -1,4 +1,5 @@
-﻿using eRekreacija.Services.Interfaces;
+﻿using eRekreacija.Models.Models;
+using eRekreacija.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,14 +11,16 @@ namespace eRekreacijaAPI.Controllers
     {
         protected new readonly ICRUDService<TModelDTO, TInsert, TUpdate> _crudService;
 
-        public BaseCRUDController(ICRUDService<TModelDTO, TInsert, TUpdate> crudService) : base(crudService) { }
+        public BaseCRUDController(ICRUDService<TModelDTO, TInsert, TUpdate> crudService) : base(crudService) {
+            _crudService = crudService;
+        }
 
         [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpPost("Insert")]
         public IActionResult Insert([FromBody] TInsert model)
         {
             var result = _crudService.Insert(model);
-            return Ok();
+            return Ok(new {Message="You successfully add."});
         }
 
         [Authorize(AuthenticationSchemes = "Bearer")]
@@ -41,6 +44,11 @@ namespace eRekreacijaAPI.Controllers
             {
                 return NotFound(ex.Message);
             }
+        }
+
+        internal void BeforeInsert(object db, ObjectInsertRequest insert)
+        {
+            throw new NotImplementedException();
         }
     }
 }

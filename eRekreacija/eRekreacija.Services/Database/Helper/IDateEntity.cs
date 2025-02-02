@@ -8,7 +8,7 @@ namespace eRekreacija.Services.Database.Helper
 {
     public interface IDateEntity
     {
-        DateTimeOffset? created_date { get; set; }
-        DateTimeOffset? updated_date { get; set; }
+        DateTime? created_date { get; set; }
+        DateTime? updated_date { get; set; }
     }
 }

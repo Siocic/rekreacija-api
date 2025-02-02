@@ -4,7 +4,7 @@
     {
         public int id { get; set; }
         public float amount { get; set; }
-        public DateTimeOffset? paid_date { get; set; }
+        public DateTime? paid_date { get; set; }
         public string user_id { get; set; }
         public tbl_Appointment TblAppointment {  get; set; }
         public int appointment_id {  get; set; }    

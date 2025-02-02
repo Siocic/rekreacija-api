@@ -92,6 +92,8 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ISportCategoryService, SportCategoryService>();
+builder.Services.AddScoped<IObjectService, ObjectService>();
+
 
 builder.Services.AddAutoMapper(typeof(IAuthService));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

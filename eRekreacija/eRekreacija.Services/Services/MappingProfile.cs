@@ -13,6 +13,11 @@ namespace eRekreacija.Services.Services
             CreateMap<ApplicationUser, RegisterRequest>();
             CreateMap<RegisterRequest, ApplicationUser>();
             CreateMap<tbl_SportCategory,SportCategoryDTO>().ReverseMap();
+
+            #region MAPPING-PROFILES-FOR-OBJECTS
+            CreateMap<tbl_Objects, ObjectsDTO>().ReverseMap();
+            CreateMap<ObjectInsertRequest, tbl_Objects>();
+            #endregion
         }
     }
 }

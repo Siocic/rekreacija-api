@@ -45,6 +45,8 @@ namespace eRekreacija.Services.Database.Context
                 e.HasKey(e => e.id);
                 e.Property(e => e.name).IsRequired().HasMaxLength(50);
                 e.Property(e => e.address).IsRequired().HasMaxLength(50);
+                e.Property(e=>e.city).IsRequired().HasMaxLength(50);
+                e.Property(e=>e.description).IsRequired().HasMaxLength(200);
             });
             modelBuilder.Entity<tbl_Appointment>(e =>
             {
