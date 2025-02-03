@@ -5,5 +5,6 @@ namespace eRekreacija.Services.Interfaces
 {
     public interface IObjectService:ICRUDService<ObjectsDTO,ObjectInsertRequest,ObjectUpdateRequest>
     {
+        Task<List<ObjectsDTO>> GetAllObjectsOfUser(string userId);
     }
 }
