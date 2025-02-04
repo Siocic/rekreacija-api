@@ -28,7 +28,7 @@ namespace eRekreacijaAPI.Controllers
         public IActionResult Update(int id, [FromBody] TUpdate model)
         {
             var result = _crudService.Update(id, model);
-            return Ok();
+            return Ok(new { Message = "Your edit was successfully." });
         }
 
         [Authorize(AuthenticationSchemes = "Bearer")]

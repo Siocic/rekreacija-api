@@ -17,6 +17,7 @@ namespace eRekreacija.Services.Services
             #region MAPPING-PROFILES-FOR-OBJECTS
             CreateMap<tbl_Objects, ObjectsDTO>().ReverseMap();
             CreateMap<ObjectInsertRequest, tbl_Objects>();
+            CreateMap<ObjectUpdateRequest, tbl_Objects>();
             #endregion
         }
     }

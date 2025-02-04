@@ -14,6 +14,10 @@ namespace eRekreacija.Services.Services
         {
 
         }
+        public virtual async Task BeforeUpdate(TModel db, TUpdate insert)
+        {
+
+        }
 
         public virtual async Task<TModelDTO> Insert(TInsert model)
         {
@@ -26,7 +30,7 @@ namespace eRekreacija.Services.Services
             return _mapper.Map<TModelDTO>(entity);
         }
 
-        public virtual TModelDTO Update(int id, TUpdate model)
+        public virtual async Task<TModelDTO> Update(int id, TUpdate model)
         {
             var entity = _rekreacijaContext.Set<TModel>().Find(id);
             if (entity == null)
@@ -34,6 +38,7 @@ namespace eRekreacija.Services.Services
 
             _mapper.Map(model,entity);
             _rekreacijaContext.SaveChanges();
+            await BeforeUpdate(entity, model);
 
             return _mapper.Map<TModelDTO>(entity);
         }

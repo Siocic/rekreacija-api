@@ -7,6 +7,7 @@ using eRekreacija.Services.Database.Entities;
 using eRekreacija.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace eRekreacija.Services.Services
 {
@@ -34,6 +35,50 @@ namespace eRekreacija.Services.Services
 
                 await _rekreacijaContext.SaveChangesAsync();
             }           
+        }
+        public override  Task BeforeUpdate(tbl_Objects entity, ObjectUpdateRequest update)
+        {
+            var findSportsId = _rekreacijaContext.Set<tbl_ObjectSportCategory>().Where(s=>s.object_id == entity.id).ToList();
+            if (findSportsId.Count()!=0)
+            {
+                _rekreacijaContext.Remove(findSportsId);
+
+                if (update.sportId != null && update.sportId.Any())
+                {
+                    foreach (var id in update.sportId)
+                    {
+                        var objectSportCategory = new tbl_ObjectSportCategory
+                        {
+                            object_id = entity.id,
+                            sport_category_id = id
+                        };
+                        _rekreacijaContext.Set<tbl_ObjectSportCategory>().Add(objectSportCategory);
+                    }
+
+                    _rekreacijaContext.SaveChangesAsync();
+                }
+            }
+            else
+            {
+                if (update.sportId != null && update.sportId.Any())
+                {
+                    foreach (var id in update.sportId)
+                    {
+                        var objectSportCategory = new tbl_ObjectSportCategory
+                        {
+                            object_id = entity.id,
+                            sport_category_id = id
+                        };
+                        _rekreacijaContext.Set<tbl_ObjectSportCategory>().Add(objectSportCategory);
+                    }
+
+                    _rekreacijaContext.SaveChangesAsync();
+                }
+            }
+
+            
+
+            return  base.BeforeUpdate(entity, update);
         }
 
         public async Task<List<ObjectsDTO>> GetAllObjectsOfUser(string userId)
