@@ -19,6 +19,11 @@ namespace eRekreacija.Services.Services
             CreateMap<ObjectInsertRequest, tbl_Objects>();
             CreateMap<ObjectUpdateRequest, tbl_Objects>();
             #endregion
+
+            #region MAPPING-PROFILES-FOR-NOTIFICATIONS
+            CreateMap<tbl_Notification,NotificationDTO>().ReverseMap();
+            CreateMap<NotificationInsertRequest, tbl_Notification>();
+            #endregion
         }
     }
 }

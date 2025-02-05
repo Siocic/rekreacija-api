@@ -74,7 +74,6 @@ namespace eRekreacija.Services.Database.Context
                 e.HasKey(o => o.id);
                 e.Property(o => o.name).IsRequired().HasMaxLength(50);
                 e.Property(o=>o.description).IsRequired().HasMaxLength(100);
-                e.HasOne(n => n.TblObject).WithMany(o=>o.Notifications).HasForeignKey(o=>o.object_id);
             });
             modelBuilder.Entity<tbl_Payment>(e =>
             {
