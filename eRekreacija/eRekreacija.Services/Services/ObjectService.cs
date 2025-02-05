@@ -19,6 +19,13 @@ namespace eRekreacija.Services.Services
             _userManager = userManager;
         }
 
+        public override  Task BeforeImageInsert(tbl_Objects entity, ObjectInsertRequest insert)
+        {
+            if (insert.ObjectImage == null)
+                entity.ObjectImage = null;
+            
+            return base.BeforeImageInsert(entity, insert);
+        }
         public override async Task BeforeInsert(tbl_Objects entity, ObjectInsertRequest insert)
         {
             if (insert.sportId != null && insert.sportId.Any())

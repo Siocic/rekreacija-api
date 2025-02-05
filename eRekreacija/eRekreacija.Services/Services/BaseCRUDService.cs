@@ -18,10 +18,16 @@ namespace eRekreacija.Services.Services
         {
 
         }
+        public virtual async Task BeforeImageInsert(TModel db, TInsert insert)
+        {
+
+        }
+
 
         public virtual async Task<TModelDTO> Insert(TInsert model)
         {
             var entity = _mapper.Map<TModel>(model);
+            await BeforeImageInsert(entity,model);
             _rekreacijaContext.Set<TModel>().Add(entity);
 
             _rekreacijaContext.SaveChanges();
