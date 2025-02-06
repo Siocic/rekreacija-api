@@ -5,5 +5,6 @@ namespace eRekreacija.Services.Interfaces
 {
     public  interface INotificationService:ICRUDService<NotificationDTO, NotificationInsertRequest,object>
     {
+        Task<List<NotificationDTO>> GetAllNotificatiosOfUser(string userId);
     }
 }
