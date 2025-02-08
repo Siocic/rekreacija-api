@@ -9,8 +9,9 @@ namespace eRekreacija.Services.Interfaces
     {
         Task<IdentityResult> RegisterUser(RegisterRequest request,int flag);
         Task<string> LoginAsync(string email, string password);
-        Task<IEnumerable<ApplicationUser>> GetAllUsersAsync();
-        Task<IEnumerable<IdentityRole>> GetAllRolesAsync();
+        Task<List<ApplicationUserDTO>> GetAllUserOfRolePravnoLice();
+        Task<List<ApplicationUserDTO>> GetAllUserOfRoleFizikoLice();
+
         Task<ApplicationUserDTO> GetUser(string userId);
         Task<bool> EditProfile(ApplicationUserDTO model);
         Task<int> ChangePassword(ChangePasswordDTO model, string userID);

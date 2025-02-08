@@ -35,13 +35,14 @@ namespace eRekreacija.Services.Services
         private readonly string _virtualhost = Environment.GetEnvironmentVariable("RabbitMQ_Virtualhost") ?? "/";
         protected readonly IdentityContext _identityContext;
 
-        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IMapper mapper, SignInManager<ApplicationUser> signInManager, IServiceProvider serviceProvider)
+        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IMapper mapper, SignInManager<ApplicationUser> signInManager, IServiceProvider serviceProvider, IdentityContext identityContext)
         {
             _roleManager = roleManager;
             _userManager = userManager;
             _mapper = mapper;
             _signInManager = signInManager;
             _serviceProvider = serviceProvider;
+            _identityContext = identityContext;
 
             var factory = new ConnectionFactory
             {
@@ -170,15 +171,43 @@ namespace eRekreacija.Services.Services
             var result = await _userManager.UpdateAsync(user);
             return result.Succeeded;
         }
-        public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync()
+        public async Task<List<ApplicationUserDTO>> GetAllUserOfRolePravnoLice()
         {
-            return await _userManager.Users.ToListAsync();
+            var role = await _identityContext.Roles.Where(s => s.Name == "PravnoLice").Select(s=>s.Id).FirstOrDefaultAsync();
+            var userIds = await _identityContext.UserRoles.Where(s => s.RoleId == role).Select(s=>s.UserId).ToListAsync();
+
+           var users = await _identityContext.User.Where(s=>userIds.Contains(s.Id) && s.isApproved==true)
+                .Select(user=>new ApplicationUserDTO
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    Address = user.Address,
+                    City = user.City,
+                    PhoneNumber = user.PhoneNumber
+                }).ToListAsync();
+            return users;
         }
-        public async Task<IEnumerable<IdentityRole>> GetAllRolesAsync()
+        public async Task<List<ApplicationUserDTO>> GetAllUserOfRoleFizikoLice()
         {
-            return await _roleManager.Roles.ToListAsync();
+            var role = await _identityContext.Roles.Where(s => s.Name == "FizickoLice").Select(s => s.Id).FirstOrDefaultAsync();
+            var userIds = await _identityContext.UserRoles.Where(s => s.RoleId == role).Select(s => s.UserId).ToListAsync();
+
+            var users = await _identityContext.User.Where(s => userIds.Contains(s.Id))
+                 .Select(user => new ApplicationUserDTO
+                 {
+                     Id = user.Id,
+                     FirstName = user.FirstName,
+                     LastName = user.LastName,
+                     Email = user.Email,
+                     Address = user.Address,
+                     City = user.City,
+                     PhoneNumber = user.PhoneNumber
+                 }).ToListAsync();
+            return users;
         }
-     
+
         public async Task<int> ChangePassword(ChangePasswordDTO model, string userId)
         {
             using (var scope = _serviceProvider.CreateScope())

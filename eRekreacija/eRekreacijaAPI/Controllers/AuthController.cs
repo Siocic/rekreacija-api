@@ -56,24 +56,25 @@ namespace eRekreacijaAPI.Controllers
         }
 
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [HttpGet("getAllUser")]
+        [HttpGet("getUserOfPravnoLice")]
         public async Task<IActionResult> GetAllUsers()
         {
-            var result = await _authService.GetAllUsersAsync();
+            var result = await _authService.GetAllUserOfRolePravnoLice();
             if (result == null)
                 return NotFound("We dont have any users yet");
             return Ok(result);
         }
 
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [HttpGet("getAllRoles")]
-        public async Task<IActionResult> GetAllRoles()
+        [HttpGet("getUserOfFizickoLice")]
+        public async Task<IActionResult> GetAllFizckoLiceUsers()
         {
-            var result = await _authService.GetAllRolesAsync();
+            var result = await _authService.GetAllUserOfRoleFizikoLice();
             if (result == null)
-                return NotFound("No roles found");
+                return NotFound("We dont have any users yet");
             return Ok(result);
         }
+
 
         [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpGet("getUser")]
