@@ -173,20 +173,20 @@ namespace eRekreacija.Services.Services
         }
         public async Task<List<ApplicationUserDTO>> GetAllUserOfRolePravnoLice()
         {
-            var role = await _identityContext.Roles.Where(s => s.Name == "PravnoLice").Select(s=>s.Id).FirstOrDefaultAsync();
-            var userIds = await _identityContext.UserRoles.Where(s => s.RoleId == role).Select(s=>s.UserId).ToListAsync();
+            var role = await _identityContext.Roles.Where(s => s.Name == "PravnoLice").Select(s => s.Id).FirstOrDefaultAsync();
+            var userIds = await _identityContext.UserRoles.Where(s => s.RoleId == role).Select(s => s.UserId).ToListAsync();
 
-           var users = await _identityContext.User.Where(s=>userIds.Contains(s.Id) && s.isApproved==true)
-                .Select(user=>new ApplicationUserDTO
-                {
-                    Id = user.Id,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Email = user.Email,
-                    Address = user.Address,
-                    City = user.City,
-                    PhoneNumber = user.PhoneNumber
-                }).ToListAsync();
+            var users = await _identityContext.User.Where(s => userIds.Contains(s.Id) && s.isApproved == true)
+                 .Select(user => new ApplicationUserDTO
+                 {
+                     Id = user.Id,
+                     FirstName = user.FirstName,
+                     LastName = user.LastName,
+                     Email = user.Email,
+                     Address = user.Address,
+                     City = user.City,
+                     PhoneNumber = user.PhoneNumber
+                 }).ToListAsync();
             return users;
         }
         public async Task<List<ApplicationUserDTO>> GetAllUserOfRoleFizikoLice()
@@ -195,6 +195,24 @@ namespace eRekreacija.Services.Services
             var userIds = await _identityContext.UserRoles.Where(s => s.RoleId == role).Select(s => s.UserId).ToListAsync();
 
             var users = await _identityContext.User.Where(s => userIds.Contains(s.Id))
+                 .Select(user => new ApplicationUserDTO
+                 {
+                     Id = user.Id,
+                     FirstName = user.FirstName,
+                     LastName = user.LastName,
+                     Email = user.Email,
+                     Address = user.Address,
+                     City = user.City,
+                     PhoneNumber = user.PhoneNumber
+                 }).ToListAsync();
+            return users;
+        }
+        public async Task<List<ApplicationUserDTO>> GetAllPravnoLiceThatNotApprovedYet()
+        {
+            var role = await _identityContext.Roles.Where(s => s.Name == "PravnoLice").Select(s => s.Id).FirstOrDefaultAsync();
+            var userIds = await _identityContext.UserRoles.Where(s => s.RoleId == role).Select(s => s.UserId).ToListAsync();
+
+            var users = await _identityContext.User.Where(s => userIds.Contains(s.Id) && s.isApproved == false)
                  .Select(user => new ApplicationUserDTO
                  {
                      Id = user.Id,
@@ -228,6 +246,33 @@ namespace eRekreacija.Services.Services
 
                 return 1;
             }
+        }
+
+        public async Task<bool> ApproveRegistration(string userId)
+        {
+            var user = await _identityContext.User.Where(s => s.Id == userId).FirstOrDefaultAsync();
+            user.isApproved = true;
+            await _identityContext.SaveChangesAsync();
+
+            string message = $"Hi {user.FirstName} {user.LastName}, \n" +
+                $"Congratulations! We're excited to inform you that your registration has been approved. You can now log in to our app using you registered email and password.\n" +
+                $"\nWe hope you enjoy exploring all the features and benefits Rekreacija has to offer.\n" +
+                $"\nWelcome aboard, and happy exploring!\n" +
+                $"\nBest regards, Rekreacija Team";
+
+            var emailToSent = new
+            {
+                Email = user.Email,
+                Message = message
+            };
+
+            var messageJson = JsonConvert.SerializeObject(emailToSent);
+
+            var body = Encoding.UTF8.GetBytes(messageJson);
+
+            _channel.BasicPublish(exchange: "", routingKey: "registrationQueue", basicProperties: null, body: body);
+
+            return true;
         }
     }
 }

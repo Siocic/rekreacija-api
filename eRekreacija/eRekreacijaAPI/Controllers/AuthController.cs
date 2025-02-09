@@ -75,6 +75,15 @@ namespace eRekreacijaAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpGet("getNotApprovedUser")]
+        public async Task<IActionResult> GetAllPravnoLiceThatNotApprovedYet()
+        {
+            var result = await _authService.GetAllPravnoLiceThatNotApprovedYet();
+            if (result == null)
+                return NotFound("We dont have any users yet");
+            return Ok(result);
+        }
 
         [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpGet("getUser")]
@@ -130,6 +139,17 @@ namespace eRekreacijaAPI.Controllers
                 _logger.LogInformation(ex, ex.InnerException?.Message, ex.Message);
                 return BadRequest();
             }
+        }
+
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpPost("approve-registartion")]
+        public async Task<IActionResult>ApproveRegistration(string userId)
+        {
+            if (userId == null)
+                return BadRequest("The model is invalid");
+
+            var result = await _authService.ApproveRegistration(userId);
+             return Ok("The registartion is approve successfully");
         }
     }
 }
