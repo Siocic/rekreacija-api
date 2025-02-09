@@ -79,6 +79,7 @@ namespace eRekreacija.Services.Services
                 UserName = request.Email,
                 Address = request.Address,
                 City = request.City,
+                PhoneNumber=request.PhoneNumber,
             };
 
             if (flag != 0)
@@ -108,7 +109,8 @@ namespace eRekreacija.Services.Services
             var message = new
             {
                 Email = user.Email,
-                Message = userEmailMessages
+                Message = userEmailMessages,
+                Subject = "Rekreacija application registartion"
             };
 
             var messageJson = JsonConvert.SerializeObject(message);

@@ -13,7 +13,7 @@ namespace EmailConsumer
             _configuration = configuration;
         }
 
-        public void SendEmailForRegistration(string userEmail, string message)
+        public void SendEmailForRegistration(string userEmail, string message,string subject)
         {
             var emailConfig = _configuration.GetSection("Email");
             var emailMessage = new MimeMessage();            
@@ -21,7 +21,7 @@ namespace EmailConsumer
             var fromEmail = Environment.GetEnvironmentVariable("Email");
             emailMessage.From.Add(new MailboxAddress("Rekreacija Registration Email", fromEmail));
             emailMessage.To.Add(new MailboxAddress("Customer", userEmail));
-            emailMessage.Subject = "Rekreacija application registration";
+            emailMessage.Subject = subject;
             emailMessage.Body = new TextPart("plain")
             {
                 Text = message

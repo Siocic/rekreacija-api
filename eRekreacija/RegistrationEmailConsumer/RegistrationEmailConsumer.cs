@@ -50,10 +50,11 @@ namespace EmailConsumer
                 var message = JsonConvert.DeserializeObject<dynamic>(messageJson);
                 var email = message?.Email?.ToString();
                 var messageContent = message?.Message?.ToString();
+                var subject = message?.Subject?.ToString()??" ";
 
                 if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(messageContent))
                 {
-                    _emailService.SendEmailForRegistration(email, messageContent);
+                    _emailService.SendEmailForRegistration(email, messageContent,subject);
                 }
             };
             _chanel.BasicConsume(queue: _configuration["RabbitMQ:QueueName"],
