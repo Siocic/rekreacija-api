@@ -258,14 +258,16 @@ namespace eRekreacija.Services.Services
 
             string message = $"Hi {user.FirstName} {user.LastName}, \n" +
                 $"Congratulations! We're excited to inform you that your registration has been approved. You can now log in to our app using you registered email and password.\n" +
-                $"\nWe hope you enjoy exploring all the features and benefits Rekreacija has to offer.\n" +
-                $"\nWelcome aboard, and happy exploring!\n" +
-                $"\nBest regards, Rekreacija Team";
+                $"\n\nWe hope you enjoy exploring all the features and benefits Rekreacija has to offer.\n" +
+                $"\n\nWelcome aboard, and happy exploring!\n" +
+                $"\n\nBest regards, Rekreacija Team";
+
 
             var emailToSent = new
             {
                 Email = user.Email,
-                Message = message
+                Message = message,
+                Subject="Welcome to Rekreacija - Your Registartion is Approved",
             };
 
             var messageJson = JsonConvert.SerializeObject(emailToSent);
