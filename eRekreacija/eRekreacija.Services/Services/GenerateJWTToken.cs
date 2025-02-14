@@ -16,7 +16,7 @@ namespace eRekreacija.Services.Services
                 new Claim(JwtRegisteredClaimNames.Email,user.Email),
                 new Claim("FirstName",user.FirstName),
                 new Claim("LastName",user.LastName),
-                new Claim("Role",role),
+                new Claim(ClaimTypes.Role,role),
                 new Claim("IsApproved",user.isApproved.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
             };

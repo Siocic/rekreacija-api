@@ -1,6 +1,7 @@
 ﻿using eRekreacija.Models.DTOs;
 using eRekreacija.Models.Models;
 using eRekreacija.Services.Database;
+using eRekreacija.Services.Database.enums;
 using eRekreacija.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -53,6 +54,20 @@ namespace eRekreacijaAPI.Controllers
                 return BadRequest(new { Message = "Invalid email or password" });
 
             return Ok(new { Message = "Login successful", Token = result });
+        }
+
+        [Authorize(AuthenticationSchemes = "Bearer",Roles ="SuperAdmin")]
+        [HttpGet("GetAllUsers")]
+        public async Task<IActionResult>GetAll()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var result = await _authService.GetAllUsers(userId);
+            if (result == null)
+                return NotFound();
+            return Ok(result);
         }
 
         [Authorize(AuthenticationSchemes = "Bearer")]

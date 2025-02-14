@@ -8,15 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using RabbitMQ.Client;
 using Newtonsoft.Json;
 using System.Text;
-using Azure.Messaging;
-using System.Security.Claims;
 using eRekreacija.Models.DTOs;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using eRekreacija.Services.Database.Context;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
-
 
 namespace eRekreacija.Services.Services
 {
@@ -79,7 +73,7 @@ namespace eRekreacija.Services.Services
                 UserName = request.Email,
                 Address = request.Address,
                 City = request.City,
-                PhoneNumber=request.PhoneNumber,
+                PhoneNumber = request.PhoneNumber,
             };
 
             if (flag != 0)
@@ -267,7 +261,7 @@ namespace eRekreacija.Services.Services
             {
                 Email = user.Email,
                 Message = message,
-                Subject="Welcome to Rekreacija - Your Registartion is Approved",
+                Subject = "Welcome to Rekreacija - Your Registartion is Approved",
             };
 
             var messageJson = JsonConvert.SerializeObject(emailToSent);
@@ -277,6 +271,27 @@ namespace eRekreacija.Services.Services
             _channel.BasicPublish(exchange: "", routingKey: "registrationQueue", basicProperties: null, body: body);
 
             return true;
+        }
+
+        public async Task<List<ApplicationUserDTO>> GetAllUsers(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if(user == null)
+                return new List<ApplicationUserDTO>();
+
+            var userList = await _identityContext.User.Where(s => s.Id!=user.Id)
+                .Select(u => new ApplicationUserDTO
+                {
+                    Id = u.Id,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Email = u.Email,
+                    Address = u.Address,
+                    City = u.City,
+                    PhoneNumber = u.PhoneNumber
+                }).ToListAsync();
+
+            return userList;
         }
     }
 }

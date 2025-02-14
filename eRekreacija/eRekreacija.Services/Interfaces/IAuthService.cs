@@ -16,5 +16,6 @@ namespace eRekreacija.Services.Interfaces
         Task<bool> EditProfile(ApplicationUserDTO model);
         Task<int> ChangePassword(ChangePasswordDTO model, string userID);
         Task<bool> ApproveRegistration(string userId);
+        Task<List<ApplicationUserDTO>>GetAllUsers(string userId);
     }
 }
