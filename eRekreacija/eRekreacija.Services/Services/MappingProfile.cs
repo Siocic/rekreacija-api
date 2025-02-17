@@ -24,6 +24,11 @@ namespace eRekreacija.Services.Services
             CreateMap<tbl_Notification,NotificationDTO>().ReverseMap();
             CreateMap<NotificationInsertRequest, tbl_Notification>();
             #endregion
+
+            #region MAPPING-PROFILES-FOR-REVIEWS
+            CreateMap<tbl_Review, ReviewDTO>().ReverseMap();
+            CreateMap<ReviewInsertRequest, tbl_Review>();
+            #endregion
         }
     }
 }
