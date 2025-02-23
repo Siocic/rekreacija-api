@@ -11,19 +11,20 @@ using System.Threading.Tasks;
 
 namespace eRekreacija.Services.Services
 {
-    public class ObjectService:BaseCRUDService<tbl_Objects,ObjectsDTO,ObjectInsertRequest,ObjectUpdateRequest>,IObjectService
+    public class ObjectService : BaseCRUDService<tbl_Objects, ObjectsDTO, ObjectInsertRequest, ObjectUpdateRequest>, IObjectService
     {
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public ObjectService(RekreacijaContext rekreacijaContext,IMapper mapper,UserManager<ApplicationUser> userManager):base(rekreacijaContext,mapper){
+        public ObjectService(RekreacijaContext rekreacijaContext, IMapper mapper, UserManager<ApplicationUser> userManager) : base(rekreacijaContext, mapper)
+        {
             _userManager = userManager;
         }
 
-        public override  Task BeforeImageInsert(tbl_Objects entity, ObjectInsertRequest insert)
+        public override Task BeforeImageInsert(tbl_Objects entity, ObjectInsertRequest insert)
         {
             if (insert.ObjectImage == null)
                 entity.ObjectImage = null;
-            
+
             return base.BeforeImageInsert(entity, insert);
         }
         public override async Task BeforeInsert(tbl_Objects entity, ObjectInsertRequest insert)
@@ -41,12 +42,12 @@ namespace eRekreacija.Services.Services
                 }
 
                 await _rekreacijaContext.SaveChangesAsync();
-            }           
+            }
         }
-        public override  Task BeforeUpdate(tbl_Objects entity, ObjectUpdateRequest update)
+        public override Task BeforeUpdate(tbl_Objects entity, ObjectUpdateRequest update)
         {
-            var findSportsId = _rekreacijaContext.Set<tbl_ObjectSportCategory>().Where(s=>s.object_id == entity.id).ToList();
-            if (findSportsId.Count()!=0)
+            var findSportsId = _rekreacijaContext.Set<tbl_ObjectSportCategory>().Where(s => s.object_id == entity.id).ToList();
+            if (findSportsId.Count() != 0)
             {
                 _rekreacijaContext.Remove(findSportsId);
 
@@ -82,16 +83,13 @@ namespace eRekreacija.Services.Services
                     _rekreacijaContext.SaveChangesAsync();
                 }
             }
-
-            
-
-            return  base.BeforeUpdate(entity, update);
+            return base.BeforeUpdate(entity, update);
         }
         public async Task<List<ObjectsDTO>> GetAllObjectsOfUser(string userId)
         {
             var user = _userManager.FindByIdAsync(userId);
 
-            var objects = await _rekreacijaContext.TblObject.Where(s => s.user_id == userId).Include(s=>s.ObjectSportCategory).ToListAsync();
+            var objects = await _rekreacijaContext.TblObject.Where(s => s.user_id == userId).Include(s => s.ObjectSportCategory).ToListAsync();
 
             var objectDTO = objects.Select(obj => new ObjectsDTO
             {
@@ -102,14 +100,14 @@ namespace eRekreacija.Services.Services
                 description = obj.description,
                 ObjectImage = obj.ObjectImage,
                 price = obj.price,
-                sportsId=obj.ObjectSportCategory.Select(s=>s.sport_category_id).ToList(),
+                sportsId = obj.ObjectSportCategory.Select(s => s.sport_category_id).ToList(),
             }).ToList();
             return objectDTO;
         }
 
         public override async Task<List<ObjectsDTO>> Get()
         {
-            var objects = await _rekreacijaContext.Set<tbl_Objects>().Include(s => s.Reviews).ToListAsync();
+            var objects = await _rekreacijaContext.Set<tbl_Objects>().Include(s => s.Reviews).Include(s => s.ObjectSportCategory).ToListAsync();
 
             var objectsDTO = objects.Select(obj => new ObjectsDTO
             {
@@ -120,7 +118,8 @@ namespace eRekreacija.Services.Services
                 description = obj.description,
                 ObjectImage = obj.ObjectImage,
                 price = obj.price,
-                rating=obj.Reviews.Any()?obj.Reviews.Average(r=>r.rating):0
+                sportsId = obj.ObjectSportCategory.Select(s => s.sport_category_id).ToList(),
+                rating = obj.Reviews.Any() ? obj.Reviews.Average(r => r.rating) : 0
             }).ToList();
 
             return objectsDTO;
