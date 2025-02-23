@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eRekreacija.Services.Database.Context;
 using eRekreacija.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace eRekreacija.Services.Services
 {
@@ -15,9 +16,9 @@ namespace eRekreacija.Services.Services
             _rekreacijaContext = rekreacijaContext;
         }
 
-        public List<TModelDTO> Get()
+        public virtual async Task<List<TModelDTO>> Get()
         {
-           var entities=_rekreacijaContext.Set<TModel>().ToList();
+           var entities= await _rekreacijaContext.Set<TModel>().ToListAsync();
             return _mapper.Map<List<TModelDTO>>(entities);    
         }
 

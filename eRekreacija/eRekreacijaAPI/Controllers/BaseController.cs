@@ -16,9 +16,9 @@ namespace eRekreacijaAPI.Controllers
 
         [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpGet("GetAll")]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            var reuslt = _service.Get();
+            var reuslt =await _service.Get();
             return Ok(reuslt);
         }
         [Authorize(AuthenticationSchemes = "Bearer")]

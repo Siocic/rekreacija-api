@@ -7,6 +7,7 @@ using eRekreacija.Services.Database.Entities;
 using eRekreacija.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace eRekreacija.Services.Services
 {
@@ -86,7 +87,6 @@ namespace eRekreacija.Services.Services
 
             return  base.BeforeUpdate(entity, update);
         }
-
         public async Task<List<ObjectsDTO>> GetAllObjectsOfUser(string userId)
         {
             var user = _userManager.FindByIdAsync(userId);
@@ -105,7 +105,25 @@ namespace eRekreacija.Services.Services
                 sportsId=obj.ObjectSportCategory.Select(s=>s.sport_category_id).ToList(),
             }).ToList();
             return objectDTO;
-        }     
-      
+        }
+
+        public override async Task<List<ObjectsDTO>> Get()
+        {
+            var objects = await _rekreacijaContext.Set<tbl_Objects>().Include(s => s.Reviews).ToListAsync();
+
+            var objectsDTO = objects.Select(obj => new ObjectsDTO
+            {
+                id = obj.id,
+                name = obj.name,
+                address = obj.address,
+                city = obj.city,
+                description = obj.description,
+                ObjectImage = obj.ObjectImage,
+                price = obj.price,
+                rating=obj.Reviews.Any()?obj.Reviews.Average(r=>r.rating):0
+            }).ToList();
+
+            return objectsDTO;
+        }
     }
 }

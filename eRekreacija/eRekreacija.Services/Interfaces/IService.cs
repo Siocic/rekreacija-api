@@ -2,7 +2,7 @@
 {
     public interface IService<TModelDTO>
     {
-        public List<TModelDTO> Get();
+        Task<List<TModelDTO>> Get();
         public TModelDTO GetById(int id);
     }
 }

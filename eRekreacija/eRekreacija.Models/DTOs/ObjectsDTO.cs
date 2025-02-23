@@ -13,5 +13,6 @@
         public string user_id { get; set; }
         public byte[]? ObjectImage { get; set; }
         public List<int>? sportsId { get; set; }
+        public float? rating { get; set; }
     }
 }
