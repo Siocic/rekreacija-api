@@ -95,6 +95,7 @@ builder.Services.AddScoped<ISportCategoryService, SportCategoryService>();
 builder.Services.AddScoped<IObjectService, ObjectService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IFavoritesService, FavoritesService>();
 
 
 

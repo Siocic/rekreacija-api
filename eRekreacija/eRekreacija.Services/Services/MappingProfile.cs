@@ -29,6 +29,12 @@ namespace eRekreacija.Services.Services
             CreateMap<tbl_Review, ReviewDTO>().ReverseMap();
             CreateMap<ReviewInsertRequest, tbl_Review>();
             #endregion
+
+            #region MAPPING-PROFILES-FOR-FAVORITES
+            CreateMap<tbl_Favorites, FavoritesDTO>().ReverseMap();
+            CreateMap<FavoritesInsertRequest, tbl_Favorites>();
+            CreateMap<FavoritesUpdateRequest, tbl_Favorites>();
+            #endregion
         }
     }
 }
