@@ -5,5 +5,6 @@ namespace eRekreacija.Services.Interfaces
 {
     public interface IReviewService:ICRUDService<ReviewDTO, ReviewInsertRequest, object>
     {
+        Task<List<ReviewDTO>> GetReviewOfObject(int object_id);
     }
 }

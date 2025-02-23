@@ -8,5 +8,6 @@
         public DateTime created_date { get; set; }
         public string user_id { get; set; }
         public int object_id { get; set; }
+        public ApplicationUserDTO user { get; set; }
     }
 }

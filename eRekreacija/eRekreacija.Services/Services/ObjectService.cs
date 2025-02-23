@@ -7,7 +7,6 @@ using eRekreacija.Services.Database.Entities;
 using eRekreacija.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 
 namespace eRekreacija.Services.Services
 {
@@ -106,6 +105,7 @@ namespace eRekreacija.Services.Services
                 sportsId=obj.ObjectSportCategory.Select(s=>s.sport_category_id).ToList(),
             }).ToList();
             return objectDTO;
-        }
+        }     
+      
     }
 }
