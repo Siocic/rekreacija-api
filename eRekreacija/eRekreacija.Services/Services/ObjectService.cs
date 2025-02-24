@@ -7,6 +7,8 @@ using eRekreacija.Services.Database.Entities;
 using eRekreacija.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
+using System.Security.Claims;
 
 namespace eRekreacija.Services.Services
 {
@@ -104,22 +106,27 @@ namespace eRekreacija.Services.Services
             return objectDTO;
         }
 
-        public override async Task<List<ObjectsDTO>> Get()
+        public async Task<List<ObjectsDTO>>GetForUser(string userId)
         {
             var objects = await _rekreacijaContext.Set<tbl_Objects>().Include(s => s.Reviews).Include(s => s.ObjectSportCategory).ToListAsync();
 
-            var objectsDTO = objects.Select(obj => new ObjectsDTO
-            {
-                id = obj.id,
-                name = obj.name,
-                address = obj.address,
-                city = obj.city,
-                description = obj.description,
-                ObjectImage = obj.ObjectImage,
-                price = obj.price,
-                sportsId = obj.ObjectSportCategory.Select(s => s.sport_category_id).ToList(),
-                rating = obj.Reviews.Any() ? obj.Reviews.Average(r => r.rating) : 0
-            }).ToList();
+            var userFavorites = await _rekreacijaContext.Set<tbl_Favorites>().Where(f => f.user_id == userId).Select(f => f.object_id).ToListAsync();
+
+            var objectsDTO = await _rekreacijaContext.Set<tbl_Objects>()
+                .Include(s => s.ObjectSportCategory)
+                .Select(obj => new ObjectsDTO
+                {
+                    id = obj.id,
+                    name = obj.name,
+                    address = obj.address,
+                    city = obj.city,
+                    description = obj.description,
+                    ObjectImage = obj.ObjectImage,
+                    price = obj.price,
+                    rating = obj.Reviews.Any() ? obj.Reviews.Average(r => r.rating) : 0,
+                    sportsId = obj.ObjectSportCategory.Select(s => s.sport_category_id).ToList(),
+                    isFavorites = userFavorites.Contains(obj.id)
+                }).ToListAsync();
 
             return objectsDTO;
         }
@@ -128,9 +135,12 @@ namespace eRekreacija.Services.Services
         {
             var objectId = await _rekreacijaContext.Set<tbl_Favorites>().Where(s => s.user_id == userId).Select(s=>s.object_id).ToListAsync();
 
-            var objects = await _rekreacijaContext.Set<tbl_Objects>().Where(s => objectId.Contains(s.id)).ToListAsync();
+            var objects = await _rekreacijaContext.Set<tbl_Objects>().Where(s => objectId.Contains(s.id)).Include(s=>s.Reviews).ToListAsync();
 
-            var objectsDTO = objects.Select(obj => new ObjectsDTO
+            var objectsDTO = await _rekreacijaContext.Set<tbl_Objects>()
+                .Where(s=>objectId.Contains(s.id))
+            .Include(s => s.ObjectSportCategory)
+            .Select(obj => new ObjectsDTO
             {
                 id = obj.id,
                 name = obj.name,
@@ -139,9 +149,9 @@ namespace eRekreacija.Services.Services
                 description = obj.description,
                 ObjectImage = obj.ObjectImage,
                 price = obj.price,
+                rating = obj.Reviews.Any() ? obj.Reviews.Average(r => r.rating) : 0,
                 sportsId = obj.ObjectSportCategory.Select(s => s.sport_category_id).ToList(),
-                rating = obj.Reviews.Any() ? obj.Reviews.Average(r => r.rating) : 0
-            }).ToList();
+            }).ToListAsync();
 
             return objectsDTO;
         }

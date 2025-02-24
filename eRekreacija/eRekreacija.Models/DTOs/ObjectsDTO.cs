@@ -14,5 +14,6 @@
         public byte[]? ObjectImage { get; set; }
         public List<int>? sportsId { get; set; }
         public float? rating { get; set; }
+        public bool? isFavorites { get; set; }
     }
 }

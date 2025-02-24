@@ -18,5 +18,7 @@ namespace eRekreacija.Services.Database.Entities
         public ICollection<tbl_Review> Reviews { get; set; } = new List<tbl_Review>();
         public ICollection<tbl_ObjectSportCategory> ObjectSportCategory { get; set; } = new List<tbl_ObjectSportCategory>();
         public ICollection<tbl_Payment> Payment { get; set; } = new List<tbl_Payment>();
+        public ICollection<tbl_Favorites> Favorites { get; set; } = new List<tbl_Favorites>();
+
     }
 }

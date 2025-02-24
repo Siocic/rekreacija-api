@@ -34,6 +34,21 @@ namespace eRekreacijaAPI.Controllers
         }
 
         [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpGet("getObjects")]
+        public async Task<IActionResult> getObjects()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var result = await _objectService.GetForUser(userId);
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
+
+        [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpGet("getFavoritesObjectOfUser")]
         public async Task<IActionResult> GetFavoritesObject()
         {
