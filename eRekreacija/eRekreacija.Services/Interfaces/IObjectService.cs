@@ -7,6 +7,6 @@ namespace eRekreacija.Services.Interfaces
     {
         Task<List<ObjectsDTO>> GetAllObjectsOfUser(string userId);
         Task<List<ObjectsDTO>> GetFavoritesObject(string userId);
-        Task<List<ObjectsDTO>> GetForUser(string userId);
+        Task<List<ObjectsDTO>> GetObjectByCategory(string userId, int categoryId,string?name);
     }
 }

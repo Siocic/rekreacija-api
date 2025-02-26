@@ -34,14 +34,14 @@ namespace eRekreacijaAPI.Controllers
         }
 
         [Authorize(AuthenticationSchemes = "Bearer")]
-        [HttpGet("getObjects")]
-        public async Task<IActionResult> getObjects()
+        [HttpGet("getObjects/{categoryId}")]
+        public async Task<IActionResult> getObjects(int categoryId, [FromQuery]string? name=null)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
                 return Unauthorized();
 
-            var result = await _objectService.GetForUser(userId);
+            var result = await _objectService.GetObjectByCategory(userId,categoryId,name);
             if (result == null)
                 return NotFound();
 
@@ -62,5 +62,6 @@ namespace eRekreacijaAPI.Controllers
 
             return Ok(result);
         }
+       
     }
 }

@@ -106,14 +106,15 @@ namespace eRekreacija.Services.Services
             return objectDTO;
         }
 
-        public async Task<List<ObjectsDTO>>GetForUser(string userId)
+        public async Task<List<ObjectsDTO>> GetObjectByCategory(string userId, int categoryId,string?name=null)
         {
-            var objects = await _rekreacijaContext.Set<tbl_Objects>().Include(s => s.Reviews).Include(s => s.ObjectSportCategory).ToListAsync();
+            var objectsIds = await _rekreacijaContext.Set<tbl_ObjectSportCategory>().Where(s => s.sport_category_id == categoryId).Select(s => s.object_id).ToListAsync();
 
             var userFavorites = await _rekreacijaContext.Set<tbl_Favorites>().Where(f => f.user_id == userId).Select(f => f.object_id).ToListAsync();
 
             var objectsDTO = await _rekreacijaContext.Set<tbl_Objects>()
-                .Include(s => s.ObjectSportCategory)
+                               .Where(s => objectsIds.Contains(s.id) && (string.IsNullOrEmpty(name) || s.name.Contains(name)))
+
                 .Select(obj => new ObjectsDTO
                 {
                     id = obj.id,
@@ -124,7 +125,6 @@ namespace eRekreacija.Services.Services
                     ObjectImage = obj.ObjectImage,
                     price = obj.price,
                     rating = obj.Reviews.Any() ? obj.Reviews.Average(r => r.rating) : 0,
-                    sportsId = obj.ObjectSportCategory.Select(s => s.sport_category_id).ToList(),
                     isFavorites = userFavorites.Contains(obj.id)
                 }).ToListAsync();
 
@@ -152,6 +152,24 @@ namespace eRekreacija.Services.Services
                 rating = obj.Reviews.Any() ? obj.Reviews.Average(r => r.rating) : 0,
                 sportsId = obj.ObjectSportCategory.Select(s => s.sport_category_id).ToList(),
             }).ToListAsync();
+
+            return objectsDTO;
+        }
+
+        public override async Task<List<ObjectsDTO>> Get()
+        {
+            var objectsDTO = await _rekreacijaContext.Set<tbl_Objects>()
+               .Select(obj => new ObjectsDTO
+               {
+                   id = obj.id,
+                   name = obj.name,
+                   address = obj.address,
+                   city = obj.city,
+                   description = obj.description,
+                   ObjectImage = obj.ObjectImage,
+                   price = obj.price,
+                   rating = obj.Reviews.Any() ? obj.Reviews.Average(r => r.rating) : 0,
+               }).ToListAsync();
 
             return objectsDTO;
         }
