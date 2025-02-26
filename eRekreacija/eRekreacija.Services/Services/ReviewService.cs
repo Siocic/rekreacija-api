@@ -58,5 +58,44 @@ namespace eRekreacija.Services.Services
 
             return reviews;
         }
+
+        public async Task<List<ReviewDTO>> GetReviewsForMyObjects(string userId)
+        {
+            var objectsId = await _rekreacijaContext.Set<tbl_Objects>().Where(s => s.user_id == userId).Select(s => s.id).ToListAsync();
+
+            var reviews = await _rekreacijaContext.Set<tbl_Review>().Where(s => objectsId.Contains(s.object_id)).OrderByDescending(s => s.created_date)
+                .Select(s => new ReviewDTO
+                {
+                    id=s.id,
+                    comment=s.comment,
+                    rating=s.rating,
+                    created_date=s.created_date,
+                    object_id=s.object_id,
+                    user_id=s.user_id
+                }).ToListAsync();
+
+            if (!reviews.Any())
+                return new List<ReviewDTO>();
+
+            var userIds = reviews.Select(r => r.user_id).Distinct().ToList();
+
+            var users = await _userManager.Users.Where(u => userIds.Contains(u.Id))
+                .Select(u => new ApplicationUserDTO
+                {
+                    Id = u.Id,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                }).ToListAsync();
+
+            var userDict = users.ToDictionary(u => u.Id, u => u);
+
+            foreach (var review in reviews)
+            {
+                if (userDict.TryGetValue(review.user_id, out var user))
+                    review.user = user;
+            }
+
+            return reviews;
+        }
     }
 }

@@ -3,6 +3,7 @@ using eRekreacija.Models.Models;
 using eRekreacija.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace eRekreacijaAPI.Controllers
 {
@@ -28,5 +29,19 @@ namespace eRekreacijaAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpGet("getReviewsForMyObjects")]
+        public async Task<IActionResult> GetReviewsForMyObjects()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var result = await _reviewService.GetReviewsForMyObjects(userId);
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
     }
 }
