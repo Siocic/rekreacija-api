@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using eRekreacija.Services.Database.Context;
 
@@ -11,9 +12,11 @@ using eRekreacija.Services.Database.Context;
 namespace eRekreacija.Services.Migrations.Rekreacija
 {
     [DbContext(typeof(RekreacijaContext))]
-    partial class RekreacijaContextModelSnapshot : ModelSnapshot
+    [Migration("20250227223943_addImagePath")]
+    partial class addImagePath
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -165,6 +168,9 @@ namespace eRekreacija.Services.Migrations.Rekreacija
 
                     b.Property<string>("ImagePath")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("ObjectImage")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("address")
                         .IsRequired()

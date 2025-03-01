@@ -1,5 +1,4 @@
-﻿using eRekreacija.Models.Models;
-using eRekreacija.Services.Interfaces;
+﻿using eRekreacija.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,38 +16,51 @@ namespace eRekreacijaAPI.Controllers
 
         [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpPost("Insert")]
-        public IActionResult Insert([FromBody] TInsert model)
+        public async Task<IActionResult> Insert([FromBody] TInsert model)
         {
-            var result = _crudService.Insert(model);
-            return Ok(new {Message="You successfully add."});
+            try
+            {
+                var result = await _crudService.Insert(model);
+                return Ok(new { Message = "You successfully add." });
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+           
         }
 
         [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpPut("Update/{id}")]
-        public IActionResult Update(int id, [FromBody] TUpdate model)
+        public async Task<IActionResult> Update(int id, [FromBody] TUpdate model)
         {
-            var result = _crudService.Update(id, model);
-            return Ok(new { Message = "Your edit was successfully." });
+            try
+            {
+                var result = await _crudService.Update(id, model);
+                return Ok(new { Message = "Your edit was successfully." });
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }          
         }
 
         [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpDelete("Delete/{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                _crudService.Delete(id);
+                await _crudService.Delete(id);
                 return Ok();
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 return NotFound(ex.Message);
             }
-        }
-
-        internal void BeforeInsert(object db, ObjectInsertRequest insert)
-        {
-            throw new NotImplementedException();
-        }
+        }       
     }
 }

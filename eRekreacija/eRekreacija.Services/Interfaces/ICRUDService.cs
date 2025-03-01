@@ -4,6 +4,6 @@
     {
         Task<TModelDTO> Insert(TInsert model);
         Task<TModelDTO> Update(int id,TUpdate model);
-        void Delete(int id);    
+        Task<bool> Delete(int id);    
     }
 }

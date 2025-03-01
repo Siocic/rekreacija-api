@@ -30,4 +30,8 @@
     <ProjectReference Include="..\eRekreacija.Services\eRekreacija.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\" />
+  </ItemGroup>
+
 </Project>

@@ -5,28 +5,59 @@ using eRekreacija.Services.Database;
 using eRekreacija.Services.Database.Context;
 using eRekreacija.Services.Database.Entities;
 using eRekreacija.Services.Interfaces;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
-using System.Security.Claims;
 
 namespace eRekreacija.Services.Services
 {
     public class ObjectService : BaseCRUDService<tbl_Objects, ObjectsDTO, ObjectInsertRequest, ObjectUpdateRequest>, IObjectService
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IHostingEnvironment _host;
 
-        public ObjectService(RekreacijaContext rekreacijaContext, IMapper mapper, UserManager<ApplicationUser> userManager) : base(rekreacijaContext, mapper)
+        public ObjectService(RekreacijaContext rekreacijaContext, IMapper mapper, UserManager<ApplicationUser> userManager, IHostingEnvironment host) : base(rekreacijaContext, mapper)
         {
+            _host = host;
             _userManager = userManager;
         }
 
-        public override Task BeforeImageInsert(tbl_Objects entity, ObjectInsertRequest insert)
+        public override async Task BeforeImageInsert(tbl_Objects entity, ObjectInsertRequest insert)
         {
-            if (insert.ObjectImage == null)
-                entity.ObjectImage = null;
+            string cleanedName = string.IsNullOrWhiteSpace(insert.name)
+                   ? "defaultobject"
+                   : new string(insert.name.Where(char.IsLetterOrDigit).ToArray()).ToLower();
 
-            return base.BeforeImageInsert(entity, insert);
+            string fileName = $"{cleanedName}.jpg";
+            string filePath = Path.Combine(_host.WebRootPath, "images", fileName);
+
+            await System.IO.File.WriteAllBytesAsync(filePath, insert.ObjectImage);
+            entity.ImagePath = $"/images/{fileName}";
+
+            await base.BeforeImageInsert(entity, insert);
+        }
+        public override async Task BeforeImageUpdate(tbl_Objects entity, ObjectUpdateRequest update)
+        {
+            if(update.ObjectImage!=null)
+            {
+                string imagePath = Path.Combine(_host.WebRootPath, entity.ImagePath.TrimStart('/'));
+                if (System.IO.File.Exists(imagePath))
+                    System.IO.File.Delete(imagePath);
+
+                string cleanedName = string.IsNullOrWhiteSpace(update.name)
+               ? "defaultobject"
+               : new string(update.name.Where(char.IsLetterOrDigit).ToArray()).ToLower();
+
+                string fileName = $"{cleanedName}.jpg";
+                string filePath = Path.Combine(_host.WebRootPath, "images", fileName);
+
+                await System.IO.File.WriteAllBytesAsync(filePath, update.ObjectImage);
+                entity.ImagePath = $"/images/{fileName}";
+
+                await base.BeforeImageUpdate(entity, update);
+            }
+            else
+                await base.BeforeImageUpdate(entity, update);
         }
         public override async Task BeforeInsert(tbl_Objects entity, ObjectInsertRequest insert)
         {
@@ -39,18 +70,18 @@ namespace eRekreacija.Services.Services
                         object_id = entity.id,
                         sport_category_id = id
                     };
-                    _rekreacijaContext.Set<tbl_ObjectSportCategory>().Add(objectSportCategory);
+                   await _rekreacijaContext.Set<tbl_ObjectSportCategory>().AddAsync(objectSportCategory);
                 }
 
                 await _rekreacijaContext.SaveChangesAsync();
             }
         }
-        public override Task BeforeUpdate(tbl_Objects entity, ObjectUpdateRequest update)
+        public override async Task BeforeUpdate(tbl_Objects entity, ObjectUpdateRequest update)
         {
             var findSportsId = _rekreacijaContext.Set<tbl_ObjectSportCategory>().Where(s => s.object_id == entity.id).ToList();
             if (findSportsId.Count() != 0)
             {
-                _rekreacijaContext.Remove(findSportsId);
+                _rekreacijaContext.RemoveRange(findSportsId);
 
                 if (update.sportId != null && update.sportId.Any())
                 {
@@ -61,10 +92,10 @@ namespace eRekreacija.Services.Services
                             object_id = entity.id,
                             sport_category_id = id
                         };
-                        _rekreacijaContext.Set<tbl_ObjectSportCategory>().Add(objectSportCategory);
+                       await _rekreacijaContext.Set<tbl_ObjectSportCategory>().AddAsync(objectSportCategory);
                     }
 
-                    _rekreacijaContext.SaveChangesAsync();
+                   await _rekreacijaContext.SaveChangesAsync();
                 }
             }
             else
@@ -78,19 +109,27 @@ namespace eRekreacija.Services.Services
                             object_id = entity.id,
                             sport_category_id = id
                         };
-                        _rekreacijaContext.Set<tbl_ObjectSportCategory>().Add(objectSportCategory);
+                        await _rekreacijaContext.Set<tbl_ObjectSportCategory>().AddAsync(objectSportCategory);
                     }
 
-                    _rekreacijaContext.SaveChangesAsync();
+                    await _rekreacijaContext.SaveChangesAsync();
                 }
             }
-            return base.BeforeUpdate(entity, update);
+            await base.BeforeUpdate(entity, update);
+        }
+        public override async Task BeforeDelete(tbl_Objects db)
+        {
+            string imagePath = Path.Combine(_host.WebRootPath, db.ImagePath.TrimStart('/'));
+            if (System.IO.File.Exists(imagePath))
+                System.IO.File.Delete(imagePath);
+
+            await base.BeforeDelete(db);
         }
         public async Task<List<ObjectsDTO>> GetAllObjectsOfUser(string userId)
         {
             var user = _userManager.FindByIdAsync(userId);
 
-            var objects = await _rekreacijaContext.TblObject.Where(s => s.user_id == userId).Include(s => s.ObjectSportCategory).ToListAsync();
+            var objects = await _rekreacijaContext.TblObject.Where(s => s.user_id == userId).OrderByDescending(s=>s.created_date).Include(s => s.ObjectSportCategory).ToListAsync();
 
             var objectDTO = objects.Select(obj => new ObjectsDTO
             {
@@ -99,14 +138,14 @@ namespace eRekreacija.Services.Services
                 address = obj.address,
                 city = obj.city,
                 description = obj.description,
-                ObjectImage = obj.ObjectImage,
+                ImagePath=obj.ImagePath,
                 price = obj.price,
                 sportsId = obj.ObjectSportCategory.Select(s => s.sport_category_id).ToList(),
             }).ToList();
             return objectDTO;
         }
 
-        public async Task<List<ObjectsDTO>> GetObjectByCategory(string userId, int categoryId,string?name=null)
+        public async Task<List<ObjectsDTO>> GetObjectByCategory(string userId, int categoryId, string? name = null)
         {
             var objectsIds = await _rekreacijaContext.Set<tbl_ObjectSportCategory>().Where(s => s.sport_category_id == categoryId).Select(s => s.object_id).ToListAsync();
 
@@ -122,7 +161,7 @@ namespace eRekreacija.Services.Services
                     address = obj.address,
                     city = obj.city,
                     description = obj.description,
-                    ObjectImage = obj.ObjectImage,
+                    ImagePath=obj.ImagePath,
                     price = obj.price,
                     rating = obj.Reviews.Any() ? obj.Reviews.Average(r => r.rating) : 0,
                     isFavorites = userFavorites.Contains(obj.id)
@@ -133,12 +172,12 @@ namespace eRekreacija.Services.Services
 
         public async Task<List<ObjectsDTO>> GetFavoritesObject(string userId)
         {
-            var objectId = await _rekreacijaContext.Set<tbl_Favorites>().Where(s => s.user_id == userId).Select(s=>s.object_id).ToListAsync();
+            var objectId = await _rekreacijaContext.Set<tbl_Favorites>().Where(s => s.user_id == userId).Select(s => s.object_id).ToListAsync();
 
-            var objects = await _rekreacijaContext.Set<tbl_Objects>().Where(s => objectId.Contains(s.id)).Include(s=>s.Reviews).ToListAsync();
+            var objects = await _rekreacijaContext.Set<tbl_Objects>().Where(s => objectId.Contains(s.id)).Include(s => s.Reviews).ToListAsync();
 
             var objectsDTO = await _rekreacijaContext.Set<tbl_Objects>()
-                .Where(s=>objectId.Contains(s.id))
+                .Where(s => objectId.Contains(s.id))
             .Include(s => s.ObjectSportCategory)
             .Select(obj => new ObjectsDTO
             {
@@ -147,7 +186,7 @@ namespace eRekreacija.Services.Services
                 address = obj.address,
                 city = obj.city,
                 description = obj.description,
-                ObjectImage = obj.ObjectImage,
+                ImagePath=obj.ImagePath,
                 price = obj.price,
                 rating = obj.Reviews.Any() ? obj.Reviews.Average(r => r.rating) : 0,
                 sportsId = obj.ObjectSportCategory.Select(s => s.sport_category_id).ToList(),
@@ -166,7 +205,7 @@ namespace eRekreacija.Services.Services
                    address = obj.address,
                    city = obj.city,
                    description = obj.description,
-                   ObjectImage = obj.ObjectImage,
+                   ImagePath = obj.ImagePath,
                    price = obj.price,
                    rating = obj.Reviews.Any() ? obj.Reviews.Average(r => r.rating) : 0,
                }).ToListAsync();

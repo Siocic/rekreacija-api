@@ -11,7 +11,7 @@
         public string? description { get; set; }
         public float price { get; set; }
         public string user_id { get; set; }
-        public byte[]? ObjectImage { get; set; }
+        public string? ImagePath { get; set; }
         public List<int>? sportsId { get; set; }
         public float? rating { get; set; }
         public bool? isFavorites { get; set; }

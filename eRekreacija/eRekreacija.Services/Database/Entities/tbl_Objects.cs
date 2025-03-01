@@ -12,7 +12,7 @@ namespace eRekreacija.Services.Database.Entities
         public string? description { get; set; }
         public float price { get; set; }
         public string user_id { get; set; }
-        public byte[]? ObjectImage { get; set; }
+        public string? ImagePath { get; set; }
         public ICollection<tbl_Appointment> Appointments { get; set; } = new List<tbl_Appointment>();
         public ICollection<tbl_ObjectHoliday> ObjectHoliday { get; set; } = new List<tbl_ObjectHoliday>();
         public ICollection<tbl_Review> Reviews { get; set; } = new List<tbl_Review>();
