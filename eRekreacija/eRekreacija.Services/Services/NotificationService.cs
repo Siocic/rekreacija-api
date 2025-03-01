@@ -18,6 +18,39 @@ namespace eRekreacija.Services.Services
             _userManager = userManager;
         }
 
+        public override async Task<List<NotificationDTO>> Get()
+        {
+            var notifications = await _rekreacijaContext.Set<tbl_Notification>().OrderByDescending(s => s.created_date).Select(s => new NotificationDTO
+            {
+                created_date=s.created_date,
+                name=s.name,
+                description=s.description,
+                user_id=s.user_id,
+            }).ToListAsync();
+
+            if (!notifications.Any())
+                return new List<NotificationDTO>();
+
+            var userIds = notifications.Select(s => s.user_id).Distinct().ToList();
+
+            var users = await _userManager.Users.Where(u => userIds.Contains(u.Id))
+                .Select(u => new ApplicationUserDTO
+                {
+                    Id = u.Id,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                }).ToListAsync();
+
+            var userDict = users.ToDictionary(u => u.Id, u => u);
+            foreach(var notification in notifications)
+            {
+                if (userDict.TryGetValue(notification.user_id, out var user))
+                    notification.user = user;
+            }
+
+            return notifications;
+        }
+
         public async Task<List<NotificationDTO>> GetAllNotificatiosOfUser(string userId)
         {
             var user = _userManager.FindByIdAsync(userId);
