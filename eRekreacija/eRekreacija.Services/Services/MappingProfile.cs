@@ -35,6 +35,11 @@ namespace eRekreacija.Services.Services
             CreateMap<FavoritesInsertRequest, tbl_Favorites>();
             CreateMap<FavoritesUpdateRequest, tbl_Favorites>();
             #endregion
+
+            #region MAPPING-PROFILES-FOR-APPOINTMENTS
+            CreateMap<tbl_Appointment, AppointmentDTO>().ReverseMap();
+            CreateMap<AppointmentInsertRequest, tbl_Appointment>();
+            #endregion
         }
     }
 }

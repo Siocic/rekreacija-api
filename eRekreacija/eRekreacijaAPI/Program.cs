@@ -96,8 +96,7 @@ builder.Services.AddScoped<IObjectService, ObjectService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IFavoritesService, FavoritesService>();
-
-
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 
 builder.Services.AddAutoMapper(typeof(IAuthService));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
