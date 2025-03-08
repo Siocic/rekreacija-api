@@ -5,10 +5,11 @@
         public int id { get; set; }
         public DateTime? appointment_date { get; set; }
         public DateTime? start_time { get; set; }
-        public DateTime? end_time { get;set; }
+        public DateTime? end_time { get; set; }
         public bool? is_approved { get; set; } = null;
-        public tbl_Objects TblObjects {  get; set; }    
-        public int object_id {  get; set; } 
-        public tbl_Payment TblPayment {  get; set; }    
+        public tbl_Objects TblObjects { get; set; }
+        public int object_id { get; set; }
+        public string user_id { get; set; }
+        public tbl_Payment TblPayment { get; set; }
     }
 }
