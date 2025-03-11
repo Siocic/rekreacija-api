@@ -62,6 +62,27 @@ namespace eRekreacijaAPI.Controllers
 
             return Ok(result);
         }
-       
+
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpGet("getRecommended")]
+        public async Task<IActionResult>GetRecommended()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+            Guid userGuid = Guid.Parse(userId);
+
+            try
+            {
+                var result = _objectService.Recomended(userId);
+                return Ok(result);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
     }
 }

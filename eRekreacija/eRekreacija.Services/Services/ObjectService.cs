@@ -8,6 +8,12 @@ using eRekreacija.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.ML;
+using Microsoft.ML.Data;
+using Microsoft.ML.Trainers;
+using System.ComponentModel.Design;
+using System.Linq;
+using static eRekreacija.Services.Services.ObjectService;
 
 namespace eRekreacija.Services.Services
 {
@@ -38,7 +44,7 @@ namespace eRekreacija.Services.Services
         }
         public override async Task BeforeImageUpdate(tbl_Objects entity, ObjectUpdateRequest update)
         {
-            if(update.ObjectImage!=null)
+            if (update.ObjectImage != null)
             {
                 string imagePath = Path.Combine(_host.WebRootPath, entity.ImagePath.TrimStart('/'));
                 if (System.IO.File.Exists(imagePath))
@@ -70,7 +76,7 @@ namespace eRekreacija.Services.Services
                         object_id = entity.id,
                         sport_category_id = id
                     };
-                   await _rekreacijaContext.Set<tbl_ObjectSportCategory>().AddAsync(objectSportCategory);
+                    await _rekreacijaContext.Set<tbl_ObjectSportCategory>().AddAsync(objectSportCategory);
                 }
 
                 await _rekreacijaContext.SaveChangesAsync();
@@ -92,10 +98,10 @@ namespace eRekreacija.Services.Services
                             object_id = entity.id,
                             sport_category_id = id
                         };
-                       await _rekreacijaContext.Set<tbl_ObjectSportCategory>().AddAsync(objectSportCategory);
+                        await _rekreacijaContext.Set<tbl_ObjectSportCategory>().AddAsync(objectSportCategory);
                     }
 
-                   await _rekreacijaContext.SaveChangesAsync();
+                    await _rekreacijaContext.SaveChangesAsync();
                 }
             }
             else
@@ -129,7 +135,7 @@ namespace eRekreacija.Services.Services
         {
             var user = _userManager.FindByIdAsync(userId);
 
-            var objects = await _rekreacijaContext.TblObject.Where(s => s.user_id == userId).OrderByDescending(s=>s.created_date).Include(s => s.ObjectSportCategory).ToListAsync();
+            var objects = await _rekreacijaContext.TblObject.Where(s => s.user_id == userId).OrderByDescending(s => s.created_date).Include(s => s.ObjectSportCategory).ToListAsync();
 
             var objectDTO = objects.Select(obj => new ObjectsDTO
             {
@@ -138,7 +144,7 @@ namespace eRekreacija.Services.Services
                 address = obj.address,
                 city = obj.city,
                 description = obj.description,
-                ImagePath=obj.ImagePath,
+                ImagePath = obj.ImagePath,
                 price = obj.price,
                 sportsId = obj.ObjectSportCategory.Select(s => s.sport_category_id).ToList(),
             }).ToList();
@@ -161,7 +167,7 @@ namespace eRekreacija.Services.Services
                     address = obj.address,
                     city = obj.city,
                     description = obj.description,
-                    ImagePath=obj.ImagePath,
+                    ImagePath = obj.ImagePath,
                     price = obj.price,
                     rating = obj.Reviews.Any() ? obj.Reviews.Average(r => r.rating) : 0,
                     isFavorites = userFavorites.Contains(obj.id)
@@ -186,7 +192,7 @@ namespace eRekreacija.Services.Services
                 address = obj.address,
                 city = obj.city,
                 description = obj.description,
-                ImagePath=obj.ImagePath,
+                ImagePath = obj.ImagePath,
                 price = obj.price,
                 rating = obj.Reviews.Any() ? obj.Reviews.Average(r => r.rating) : 0,
                 sportsId = obj.ObjectSportCategory.Select(s => s.sport_category_id).ToList(),
@@ -211,6 +217,169 @@ namespace eRekreacija.Services.Services
                }).ToListAsync();
 
             return objectsDTO;
+        }
+
+        static MLContext mlContext = new MLContext();
+        static object isLocked = new object();
+        static ITransformer model = null;
+        static Dictionary<string, uint> userGuidToInt = new();
+        static Dictionary<int, uint> objectIdToUint = new(); 
+
+        public List<ObjectsDTO> Recomended(string userId)
+        {
+            lock (isLocked)
+            {
+                var reviews = _rekreacijaContext.Set<tbl_Review>().ToList();
+                var appointments = _rekreacijaContext.Set<tbl_Appointment>().ToList();
+                var favorites = _rekreacijaContext.Set<tbl_Favorites>().ToList();
+
+                if (reviews.Count < 10)
+                {
+                    var popularObjects = _rekreacijaContext.Set<tbl_Objects>()
+                        .OrderByDescending(o => o.Reviews.Count)
+                        .Take(4)
+                        .ToList();
+
+                    if (popularObjects.Count == 0)
+                    {
+                        popularObjects = _rekreacijaContext.Set<tbl_Objects>()
+                            .OrderBy(o => Guid.NewGuid())
+                            .Take(4)
+                            .ToList();
+                    }
+
+                    return _mapper.Map<List<ObjectsDTO>>(popularObjects);
+                }
+
+                uint userCounter = 1;
+                uint objectCounter = 1;
+
+                foreach (var user in reviews.Select(r => r.user_id).Distinct())
+                {
+                    if (!userGuidToInt.ContainsKey(user))
+                        userGuidToInt[user] = userCounter++;
+                }
+
+                foreach (var obj in reviews.Select(r => r.object_id).Distinct())
+                {
+                    if (!objectIdToUint.ContainsKey(obj))
+                        objectIdToUint[obj] = objectCounter++;
+                }
+
+                var data = reviews.Select(r => new ProductEntry
+                {
+                    UserID = userGuidToInt[r.user_id],
+                    ObjectID = objectIdToUint[r.object_id],
+                    label = 1
+                }).ToList();
+
+                foreach (var app in appointments)
+                {
+                    if (!userGuidToInt.ContainsKey(app.user_id))
+                        userGuidToInt[app.user_id] = userCounter++;
+
+                    if (!objectIdToUint.ContainsKey(app.object_id))
+                        objectIdToUint[app.object_id] = objectCounter++;
+
+                    data.Add(new ProductEntry
+                    {
+                        UserID = userGuidToInt[app.user_id],
+                        ObjectID = objectIdToUint[app.object_id],
+                        label = 1
+                    });
+                }
+
+                foreach(var fav in favorites)
+                {
+                    if (!userGuidToInt.ContainsKey(fav.user_id))
+                        userGuidToInt[fav.user_id] = userCounter++;
+
+                    if (!objectIdToUint.ContainsKey(fav.object_id))
+                        objectIdToUint[fav.object_id] = objectCounter++;
+
+                    data.Add(new ProductEntry
+                    {
+                        UserID = userGuidToInt[fav.user_id],
+                        ObjectID = objectIdToUint[fav.object_id],
+                        label = 1
+                    });
+                }
+
+                if (model == null)
+                {
+                    var trainData = mlContext.Data.LoadFromEnumerable(data);
+                    var options = new MatrixFactorizationTrainer.Options
+                    {
+                        MatrixColumnIndexColumnName = nameof(ProductEntry.UserID),
+                        MatrixRowIndexColumnName = nameof(ProductEntry.ObjectID),
+                        LabelColumnName = nameof(ProductEntry.label),
+                        LossFunction = MatrixFactorizationTrainer.LossFunctionType.SquareLossOneClass,
+                        Alpha = 0.01,
+                        Lambda = 0.025,
+                        NumberOfIterations = 100
+                    };
+
+                    var estimator = mlContext.Recommendation().Trainers.MatrixFactorization(options);
+                    model = estimator.Fit(trainData);
+                }
+
+                if (!userGuidToInt.ContainsKey(userId))
+                {
+                    var fallbackObjects = _rekreacijaContext.Set<tbl_Objects>()
+                        .OrderByDescending(o => o.Reviews.Count)
+                        .Take(4)
+                        .ToList();
+
+                    return _mapper.Map<List<ObjectsDTO>>(fallbackObjects);
+                }
+
+                uint mappedUserId = userGuidToInt[userId]; 
+
+                var allObjects = _rekreacijaContext.Set<tbl_Objects>().ToList();
+
+                var predictionEngine = mlContext.Model.CreatePredictionEngine<ProductEntry, Copurchase_prediction>(model);
+
+                var recommendations = allObjects
+                    .Where(o => objectIdToUint.ContainsKey(o.id))
+                    .Select(o => new
+                    {
+                        Object = o,
+                        Score = predictionEngine.Predict(new ProductEntry
+                        {
+                            UserID = mappedUserId,
+                            ObjectID = objectIdToUint[o.id]
+                        }).Score
+                    })
+                    .OrderByDescending(x => x.Score)
+                    .Take(5)
+                    .Select(x => new ObjectsDTO
+                    {
+                        id = x.Object.id,
+                        name = x.Object.name,
+                        address = x.Object.address,
+                        city = x.Object.city,
+                        description = x.Object.description,
+                        ImagePath = x.Object.ImagePath,
+                        price = x.Object.price,
+                        rating = x.Object.Reviews.Any() ? x.Object.Reviews.Average(r => r.rating) : 0
+                    })
+                    .ToList();
+
+                return recommendations;
+            }
+        }
+
+        public class Copurchase_prediction
+        {
+            public float Score { get; set; }
+        }
+        public class ProductEntry
+        {
+            [KeyType(count: 100)]
+            public uint UserID { get; set; }
+            [KeyType(count: 100)]
+            public uint ObjectID { get; set; }
+            public float label { get; set; }
         }
     }
 }
