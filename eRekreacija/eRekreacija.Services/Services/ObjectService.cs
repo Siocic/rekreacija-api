@@ -11,9 +11,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Trainers;
-using System.ComponentModel.Design;
-using System.Linq;
-using static eRekreacija.Services.Services.ObjectService;
 
 namespace eRekreacija.Services.Services
 {
@@ -223,7 +220,7 @@ namespace eRekreacija.Services.Services
         static object isLocked = new object();
         static ITransformer model = null;
         static Dictionary<string, uint> userGuidToInt = new();
-        static Dictionary<int, uint> objectIdToUint = new(); 
+        static Dictionary<int, uint> objectIdToUint = new();
 
         public List<ObjectsDTO> Recomended(string userId)
         {
@@ -289,7 +286,7 @@ namespace eRekreacija.Services.Services
                     });
                 }
 
-                foreach(var fav in favorites)
+                foreach (var fav in favorites)
                 {
                     if (!userGuidToInt.ContainsKey(fav.user_id))
                         userGuidToInt[fav.user_id] = userCounter++;
@@ -333,7 +330,7 @@ namespace eRekreacija.Services.Services
                     return _mapper.Map<List<ObjectsDTO>>(fallbackObjects);
                 }
 
-                uint mappedUserId = userGuidToInt[userId]; 
+                uint mappedUserId = userGuidToInt[userId];
 
                 var allObjects = _rekreacijaContext.Set<tbl_Objects>().ToList();
 
@@ -380,6 +377,25 @@ namespace eRekreacija.Services.Services
             [KeyType(count: 100)]
             public uint ObjectID { get; set; }
             public float label { get; set; }
+        }
+
+        public async Task<List<ObjectsDTO>> GetRecentAppointments(string userId)
+        {
+            var objectIds = await _rekreacijaContext.Set<tbl_Appointment>().Where(s => s.user_id == userId).OrderByDescending(s => s.appointment_date).Select(s => s.object_id).Distinct().ToListAsync();
+
+            var objects = await _rekreacijaContext.Set<tbl_Objects>().Where(s => objectIds.Contains(s.id)).Select(s => new ObjectsDTO
+            {
+                id = s.id,
+                name = s.name,
+                address = s.address,
+                city = s.city,
+                description = s.description,
+                ImagePath = s.ImagePath,
+                price = s.price,
+                rating = s.Reviews.Any() ? s.Reviews.Average(r => r.rating) : 0
+            }).Take(3).ToListAsync();
+
+            return objects;
         }
     }
 }

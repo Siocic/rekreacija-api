@@ -84,5 +84,25 @@ namespace eRekreacijaAPI.Controllers
             }
         }
 
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpGet("getRecentAppointments")]
+        public async Task<IActionResult> GetRecentAppointments()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (userId == null)
+                return Unauthorized();
+
+            try
+            {
+                var result = await _objectService.GetRecentAppointments(userId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+
+        }
     }
 }
