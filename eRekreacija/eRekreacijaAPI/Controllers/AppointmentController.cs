@@ -51,5 +51,20 @@ namespace eRekreacijaAPI.Controllers
                 return BadRequest();
             }
         }
+
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpGet("GetMyClients")]
+        public async Task<IActionResult> GetMyClients()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var result = await _appointmentService.GetMyClients(userId);
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
     }
 }

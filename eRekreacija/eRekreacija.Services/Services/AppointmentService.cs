@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace eRekreacija.Services.Services
@@ -204,6 +205,42 @@ namespace eRekreacija.Services.Services
             {
                 return false;
             }
-        }              
+        }
+
+        public async Task<List<MyClientsDTO>> GetMyClients(string userId)
+        {
+            var objectsIds = await _rekreacijaContext.Set<tbl_Objects>().Where(s => s.user_id == userId).Select(s=>s.id).ToListAsync();
+
+            var appointmnetsUser = _rekreacijaContext.Set<tbl_Appointment>().Where(s => objectsIds.Contains(s.object_id) && s.is_approved == true).ToList();
+
+            var appointmentStats = appointmnetsUser.GroupBy(a => a.user_id).ToDictionary(g => g.Key, g => new
+            {
+                NumberOfAppointments = g.Count(),
+                LastAppointmentDate = g.Max(x => x.appointment_date),
+            });
+
+            var userIds = appointmentStats.Keys.ToList();
+
+            var users = await  _userManager.Users.Where(u => userIds.Contains(u.Id)).Select(u => new ApplicationUserDTO
+            {
+                Id = u.Id,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Email = u.Email,
+                PhoneNumber = u.PhoneNumber,
+            }).ToListAsync();
+
+            var myClients = users.Select(u => new MyClientsDTO
+            {
+                FullName = u.FirstName + " " + u.LastName,
+                Email = u.Email,
+                PhoneNumber = u.PhoneNumber,
+                NumberOfAppointments = appointmentStats[u.Id].NumberOfAppointments,
+                LastAppointmentDate = appointmentStats[u.Id].LastAppointmentDate,
+            }).ToList();
+
+            return myClients;   
+          
+        }
     }
 }
