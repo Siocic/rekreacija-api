@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace eRekreacija.Services.Services
@@ -241,6 +240,58 @@ namespace eRekreacija.Services.Services
 
             return myClients;   
           
+        }
+
+        public async Task<List<MyClientPayments>> GetMyClientPayments(string userId)
+        {
+            var objectsIds = await _rekreacijaContext.Set<tbl_Objects>().Where(s => s.user_id == userId).Select(s => s.id).ToListAsync();
+
+            var appointmnetsIds = _rekreacijaContext.Set<tbl_Appointment>().Where(s => objectsIds.Contains(s.object_id) && s.is_approved == true).Select(s=>s.id).ToList();
+
+            var payments=await _rekreacijaContext.Set<tbl_Payment>().Where(s=> appointmnetsIds.Contains(s.appointment_id))
+                .Select(s=>new MyClientPayments
+                {
+                    Amount = s.amount,
+                    AppointmentDate=s.paid_date,
+                    user_id = s.user_id,
+                    object_id = s.object_id,
+                })
+                .ToListAsync();
+
+            var objectIds = payments.Select(s=>s.object_id).Distinct().ToList();
+            var objects = await _rekreacijaContext.Set<tbl_Objects>().Where(s => objectIds.Contains(s.id)).Select(s => new
+            {
+                Id = s.id,
+                ObjectName = s.name
+            }).ToListAsync();
+            var obj = objects.ToDictionary(o => o.Id, o => o);
+
+            var userIds = payments.Select(s=>s.user_id).Distinct().ToList();
+            var users = await _userManager.Users.Where(u => userIds.Contains(u.Id)).Select(u => new ApplicationUserDTO
+            {
+                Id = u.Id,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Email = u.Email,
+                PhoneNumber = u.PhoneNumber,
+            }).ToListAsync();
+            var userDict = users.ToDictionary(u => u.Id, u => u);
+
+
+            foreach (var p in payments)
+            {
+                if(obj.TryGetValue(p.object_id,out var objectDTO))
+                    p.ObjectName=objectDTO.ObjectName;
+
+                if(userDict.TryGetValue(p.user_id,out var userDTO))
+                {
+                    p.FullName=userDTO.FirstName+' '+userDTO.LastName;
+                    p.Email = userDTO.Email;
+                    p.Phone = userDTO.PhoneNumber;
+                }
+            }
+
+            return payments;
         }
     }
 }

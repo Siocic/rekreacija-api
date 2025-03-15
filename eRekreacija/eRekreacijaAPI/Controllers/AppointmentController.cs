@@ -66,5 +66,20 @@ namespace eRekreacijaAPI.Controllers
 
             return Ok(result);
         }
+
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpGet("GetMyClientPayments")]
+        public async Task<IActionResult> GetMyClientPayments()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var result = await _appointmentService.GetMyClientPayments(userId);
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
     }
 }
