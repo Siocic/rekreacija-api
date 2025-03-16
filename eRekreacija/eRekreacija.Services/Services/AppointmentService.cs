@@ -208,7 +208,7 @@ namespace eRekreacija.Services.Services
 
         public async Task<List<MyClientsDTO>> GetMyClients(string userId)
         {
-            var objectsIds = await _rekreacijaContext.Set<tbl_Objects>().Where(s => s.user_id == userId).Select(s=>s.id).ToListAsync();
+            var objectsIds = await _rekreacijaContext.Set<tbl_Objects>().Where(s => s.user_id == userId).Select(s => s.id).ToListAsync();
 
             var appointmnetsUser = _rekreacijaContext.Set<tbl_Appointment>().Where(s => objectsIds.Contains(s.object_id) && s.is_approved == true).ToList();
 
@@ -220,7 +220,7 @@ namespace eRekreacija.Services.Services
 
             var userIds = appointmentStats.Keys.ToList();
 
-            var users = await  _userManager.Users.Where(u => userIds.Contains(u.Id)).Select(u => new ApplicationUserDTO
+            var users = await _userManager.Users.Where(u => userIds.Contains(u.Id)).Select(u => new ApplicationUserDTO
             {
                 Id = u.Id,
                 FirstName = u.FirstName,
@@ -238,27 +238,27 @@ namespace eRekreacija.Services.Services
                 LastAppointmentDate = appointmentStats[u.Id].LastAppointmentDate,
             }).ToList();
 
-            return myClients;   
-          
+            return myClients;
+
         }
 
         public async Task<List<MyClientPayments>> GetMyClientPayments(string userId)
         {
             var objectsIds = await _rekreacijaContext.Set<tbl_Objects>().Where(s => s.user_id == userId).Select(s => s.id).ToListAsync();
 
-            var appointmnetsIds = _rekreacijaContext.Set<tbl_Appointment>().Where(s => objectsIds.Contains(s.object_id) && s.is_approved == true).Select(s=>s.id).ToList();
+            var appointmnetsIds = _rekreacijaContext.Set<tbl_Appointment>().Where(s => objectsIds.Contains(s.object_id) && s.is_approved == true).Select(s => s.id).ToList();
 
-            var payments=await _rekreacijaContext.Set<tbl_Payment>().Where(s=> appointmnetsIds.Contains(s.appointment_id))
-                .Select(s=>new MyClientPayments
+            var payments = await _rekreacijaContext.Set<tbl_Payment>().Where(s => appointmnetsIds.Contains(s.appointment_id))
+                .Select(s => new MyClientPayments
                 {
                     Amount = s.amount,
-                    AppointmentDate=s.paid_date,
+                    AppointmentDate = s.paid_date,
                     user_id = s.user_id,
                     object_id = s.object_id,
                 })
                 .ToListAsync();
 
-            var objectIds = payments.Select(s=>s.object_id).Distinct().ToList();
+            var objectIds = payments.Select(s => s.object_id).Distinct().ToList();
             var objects = await _rekreacijaContext.Set<tbl_Objects>().Where(s => objectIds.Contains(s.id)).Select(s => new
             {
                 Id = s.id,
@@ -266,7 +266,7 @@ namespace eRekreacija.Services.Services
             }).ToListAsync();
             var obj = objects.ToDictionary(o => o.Id, o => o);
 
-            var userIds = payments.Select(s=>s.user_id).Distinct().ToList();
+            var userIds = payments.Select(s => s.user_id).Distinct().ToList();
             var users = await _userManager.Users.Where(u => userIds.Contains(u.Id)).Select(u => new ApplicationUserDTO
             {
                 Id = u.Id,
@@ -280,18 +280,49 @@ namespace eRekreacija.Services.Services
 
             foreach (var p in payments)
             {
-                if(obj.TryGetValue(p.object_id,out var objectDTO))
-                    p.ObjectName=objectDTO.ObjectName;
+                if (obj.TryGetValue(p.object_id, out var objectDTO))
+                    p.ObjectName = objectDTO.ObjectName;
 
-                if(userDict.TryGetValue(p.user_id,out var userDTO))
+                if (userDict.TryGetValue(p.user_id, out var userDTO))
                 {
-                    p.FullName=userDTO.FirstName+' '+userDTO.LastName;
+                    p.FullName = userDTO.FirstName + ' ' + userDTO.LastName;
                     p.Email = userDTO.Email;
                     p.Phone = userDTO.PhoneNumber;
                 }
             }
 
             return payments;
+        }
+
+        public async Task<List<MyReservationDTO>> GetMyReservation(string userId)
+        {
+            var reservation = await _rekreacijaContext.Set<tbl_Appointment>().Where(s => s.user_id == userId && s.is_approved == true).Select(s => new MyReservationDTO
+            {
+                AppointmentDate = s.appointment_date,
+                object_id = s.object_id
+            }).ToListAsync();
+
+            var objectIds = reservation.Select(s => s.object_id).Distinct().ToList();
+            var objects = await _rekreacijaContext.Set<tbl_Objects>().Where(s => objectIds.Contains(s.id)).Select(s => new
+            {
+                Id = s.id,
+                ObjectName = s.name,
+                ObjectAdress = s.address,
+                ObjectImage = s.ImagePath
+            }).ToListAsync();
+            var obj = objects.ToDictionary(o => o.Id, o => o);
+
+            foreach(var r in reservation)
+            {
+                if(obj.TryGetValue(r.object_id, out var o))
+                {
+                    r.ObjectAdress=o.ObjectAdress;
+                    r.ObjectName= o.ObjectName;
+                    r.ObjectImage = o.ObjectImage;
+                }
+            }
+
+            return reservation;
         }
     }
 }

@@ -9,5 +9,6 @@ namespace eRekreacija.Services.Interfaces
         Task<bool> ApproveAppointment(int id);
         Task<List<MyClientsDTO>> GetMyClients(string userId);
         Task<List<MyClientPayments>>GetMyClientPayments(string userId);
+        Task<List<MyReservationDTO>> GetMyReservation(string userId);
     }
 }
