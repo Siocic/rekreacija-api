@@ -96,5 +96,23 @@ namespace eRekreacijaAPI.Controllers
 
             return Ok(result);
         }
+
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpGet("GetReservedTimes")]
+        public async Task<IActionResult> GetReservedTimes(int objectId, DateTime? startTime, DateTime? endTime)
+        {
+            if (objectId == null)
+                return BadRequest();
+
+            try
+            {
+                var result = await _appointmentService.GetReservedTimes(objectId, startTime, endTime);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

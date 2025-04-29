@@ -296,7 +296,7 @@ namespace eRekreacija.Services.Services
 
         public async Task<List<MyReservationDTO>> GetMyReservation(string userId)
         {
-            var reservation = await _rekreacijaContext.Set<tbl_Appointment>().Where(s => s.user_id == userId && s.is_approved == true).Select(s => new MyReservationDTO
+            var reservation = await _rekreacijaContext.Set<tbl_Appointment>().Where(s => s.user_id == userId && s.is_approved == true && s.appointment_date >= DateTime.Now).Select(s => new MyReservationDTO
             {
                 AppointmentDate = s.appointment_date,
                 object_id = s.object_id
@@ -312,17 +312,25 @@ namespace eRekreacija.Services.Services
             }).ToListAsync();
             var obj = objects.ToDictionary(o => o.Id, o => o);
 
-            foreach(var r in reservation)
+            foreach (var r in reservation)
             {
-                if(obj.TryGetValue(r.object_id, out var o))
+                if (obj.TryGetValue(r.object_id, out var o))
                 {
-                    r.ObjectAdress=o.ObjectAdress;
-                    r.ObjectName= o.ObjectName;
+                    r.ObjectAdress = o.ObjectAdress;
+                    r.ObjectName = o.ObjectName;
                     r.ObjectImage = o.ObjectImage;
                 }
             }
 
             return reservation;
+        }
+
+        public async Task<bool> GetReservedTimes(int objectId, DateTime? startTime, DateTime? endTime)
+        {
+            var reservation = await _rekreacijaContext.TblAppointment.Where(a => a.object_id == objectId && (a.start_time < endTime && a.end_time > startTime)).ToListAsync();
+            if (reservation.Any())
+                return true;
+            return false;
         }
     }
 }
