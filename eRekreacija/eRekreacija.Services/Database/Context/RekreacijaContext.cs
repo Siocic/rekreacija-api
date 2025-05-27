@@ -16,7 +16,9 @@ namespace eRekreacija.Services.Database.Context
         public DbSet<tbl_ObjectSportCategory>TblObjectSportCategory { get; set; }
         public DbSet<tbl_Notification> TblNotification { get; set; }
         public DbSet<tbl_Payment> TbPayment { get; set; }
-        public DbSet<tbl_Favorites> TblFavorite {  get; set; }  
+        public DbSet<tbl_Favorites> TblFavorite {  get; set; }
+        public DbSet<tbl_ChatMessage> TblChatMessages { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -87,6 +89,11 @@ namespace eRekreacija.Services.Database.Context
                 e.ToTable("tbl_Favorites");
                 e.HasKey(e => new {e.user_id,e.object_id});
                 e.HasOne(f => f.TblObjects).WithMany().HasForeignKey(f => f.object_id).OnDelete(DeleteBehavior.Cascade);
+            });
+            modelBuilder.Entity<tbl_ChatMessage>(e =>
+            {
+                e.ToTable("tbl_ChatMessage");
+                e.HasKey(o => o.Id);
             });
         }
 

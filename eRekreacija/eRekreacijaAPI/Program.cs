@@ -103,7 +103,12 @@ builder.Services.AddAutoMapper(typeof(IAuthService));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSignalR();
+builder.Services.AddScoped<IChatService, ChatService>();
+
 var app = builder.Build();
+
+app.MapHub<ChatHub>("/chat");
 
 using (var scope = app.Services.CreateScope())
 {

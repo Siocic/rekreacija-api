@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\eRekreacija.Chat\eRekreacija.Chat.csproj" />
     <ProjectReference Include="..\eRekreacija.Models\eRekreacija.Models.csproj" />
     <ProjectReference Include="..\eRekreacija.Services\eRekreacija.Services.csproj" />
   </ItemGroup>
