@@ -28,9 +28,9 @@ namespace eRekreacijaAPI.Controllers
 
         [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpGet("conversations/{userId}")]
-        public async Task<IActionResult> GetUserConversations(string userId)
+        public async Task<IActionResult> GetUserConversations(string userId, bool hall = true)
         {
-            var conversations = await _chatService.GetUserConversationsAsync(userId);
+            var conversations = await _chatService.GetUserConversationsAsync(userId, hall);
             return Ok(conversations);
         }
 
