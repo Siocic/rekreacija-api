@@ -134,7 +134,8 @@ namespace eRekreacija.Services.Services
         {
             var user = _userManager.FindByIdAsync(userId);
             var profile = new ApplicationUserDTO
-            {
+            { 
+                Id = userId,
                 FirstName = user.Result.FirstName,
                 LastName = user.Result.LastName,
                 Email = user.Result.Email,

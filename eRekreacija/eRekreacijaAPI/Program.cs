@@ -41,7 +41,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = "mydomain.com",
             ValidAudience = "mydomain.com",
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("my_super_secret_key_for_my_application_work_for_subject_on_collegue"))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("my_super_secret_key_for_my_application_work_for_subject_on_collegue")),
+            NameClaimType = "sub"
         };
         options.Events = new JwtBearerEvents
         {
@@ -57,6 +58,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     message = "Access denied. A valid token is required to proceed."
                 };
                 await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(response));
+            },
+
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chat"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
             }
         };
     });
@@ -108,7 +120,6 @@ builder.Services.AddScoped<IChatService, ChatService>();
 
 var app = builder.Build();
 
-app.MapHub<ChatHub>("/chat");
 
 using (var scope = app.Services.CreateScope())
 {
@@ -139,13 +150,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<ChatHub>("/chat");
 
 app.MapControllers();
 

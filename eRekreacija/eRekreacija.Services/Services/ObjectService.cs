@@ -144,6 +144,7 @@ namespace eRekreacija.Services.Services
                 ImagePath = obj.ImagePath,
                 price = obj.price,
                 sportsId = obj.ObjectSportCategory.Select(s => s.sport_category_id).ToList(),
+                user_id = obj.user_id,
             }).ToList();
             return objectDTO;
         }
@@ -167,7 +168,8 @@ namespace eRekreacija.Services.Services
                     ImagePath = obj.ImagePath,
                     price = obj.price,
                     rating = obj.Reviews.Any() ? obj.Reviews.Average(r => r.rating) : 0,
-                    isFavorites = userFavorites.Contains(obj.id)
+                    isFavorites = userFavorites.Contains(obj.id),
+                    user_id = obj.user_id
                 }).ToListAsync();
 
             return objectsDTO;
@@ -211,6 +213,7 @@ namespace eRekreacija.Services.Services
                    ImagePath = obj.ImagePath,
                    price = obj.price,
                    rating = obj.Reviews.Any() ? obj.Reviews.Average(r => r.rating) : 0,
+                   user_id = obj.user_id
                }).ToListAsync();
 
             return objectsDTO;

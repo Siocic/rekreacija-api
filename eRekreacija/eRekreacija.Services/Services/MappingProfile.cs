@@ -40,6 +40,11 @@ namespace eRekreacija.Services.Services
             CreateMap<tbl_Appointment, AppointmentDTO>().ReverseMap();
             CreateMap<AppointmentInsertRequest, tbl_Appointment>();
             #endregion
+
+            #region MAPPING-PROFILES-FOR-CHAT
+            CreateMap<ChatMessageDTO, tbl_ChatMessage>();
+            CreateMap<tbl_ChatMessage, ChatMessageDTO>();
+            #endregion
         }
     }
 }
