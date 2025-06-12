@@ -18,8 +18,6 @@ namespace eRekreacija.Services.Database.Context
         public DbSet<tbl_Payment> TbPayment { get; set; }
         public DbSet<tbl_Favorites> TblFavorite {  get; set; }
         public DbSet<tbl_ChatMessage> TblChatMessages { get; set; }
-
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<tbl_SportCategory>(e =>

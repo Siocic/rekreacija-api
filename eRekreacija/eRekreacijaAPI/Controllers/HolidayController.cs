@@ -1,8 +1,6 @@
-﻿using eRekreacija.Services.Database.Context;
-using eRekreacija.Services.Database.Entities;
-using Microsoft.AspNetCore.Authorization;
+﻿using eRekreacijaAPI.DTOs;
+using eRekreacijaAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace eRekreacijaAPI.Controllers
 {
@@ -10,46 +8,27 @@ namespace eRekreacijaAPI.Controllers
     [Route("[controller]")]
     public class HolidayController : ControllerBase
     {
-        private readonly RekreacijaContext _context;
+        private readonly IHolidayService _holidayService;
 
-        public HolidayController(RekreacijaContext context)
+        public HolidayController(IHolidayService holidayService)
         {
-            _context = context;
+            _holidayService = holidayService;
         }
 
         [HttpPost("AddHoliday")]
-        public async Task<IActionResult> AddHoliday([FromBody] tbl_Holiday holiday)
+        public async Task<IActionResult> AddHoliday([FromBody] HolidayDTO holiday)
         {
-            _context.TblHoliday.Add(holiday);
-            await _context.SaveChangesAsync();
-            return Ok(holiday);
+            var result = await _holidayService.AddHolidayAsync(holiday);
+            return Ok(result);
         }
 
         [HttpPost("AddObjectHoliday")]
         public async Task<IActionResult> AddObjectHoliday([FromBody] ObjectHolidayDTO dto)
         {
-            var exists = await _context.TblObjectHoliday
-                .AnyAsync(x => x.holiday_id == dto.HolidayId && x.object_id == dto.ObjectId);
-
-            if (exists)
+            var result = await _holidayService.AddObjectHolidayAsync(dto);
+            if (result == null)
                 return BadRequest("Holiday already assigned to this object.");
-
-            var objectHoliday = new tbl_ObjectHoliday
-            {
-                holiday_id = dto.HolidayId,
-                object_id = dto.ObjectId
-            };
-
-            _context.TblObjectHoliday.Add(objectHoliday);
-            await _context.SaveChangesAsync();
-
-            return Ok(objectHoliday);
+            return Ok(result);
         }
-    }
-
-    public class ObjectHolidayDTO
-    {
-        public int ObjectId { get; set; }
-        public int HolidayId { get; set; }
     }
 }
