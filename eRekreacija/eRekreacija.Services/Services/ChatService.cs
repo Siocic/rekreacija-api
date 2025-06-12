@@ -40,20 +40,16 @@ public class ChatService : BaseCRUDService<tbl_ChatMessage, ChatMessageDTO, Chat
             .Distinct()
             .ToList();
 
-        // Fetch all halls whose user_id matches any conversation user
-
         Dictionary<string, string> nameMap;
 
         if (hall)
         {
-            // Lookup hall names by user_id
             nameMap = await _rekreacijaContext.TblObject
                 .Where(o => conversationUserIds.Contains(o.user_id))
                 .ToDictionaryAsync(o => o.user_id, o => o.name);
         }
         else
         {
-            // Lookup usernames
             nameMap = await _identityContext.User
                 .Where(u => conversationUserIds.Contains(u.Id))
                 .ToDictionaryAsync(u => u.Id, u => u.UserName);
