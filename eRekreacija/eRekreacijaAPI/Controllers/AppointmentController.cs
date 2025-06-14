@@ -34,6 +34,21 @@ namespace eRekreacijaAPI.Controllers
         }
 
         [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpGet("GetApprovedAppointments")]
+        public async Task<IActionResult> GetApprovedAppointments()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var result = await _appointmentService.GetApprovedAppointmentOfObject(userId);
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
+
+        [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpPost("ApproveAppointment")]
         public async Task<IActionResult> ApproveAppointment(int id)
         {

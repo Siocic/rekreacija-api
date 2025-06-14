@@ -134,6 +134,53 @@ namespace eRekreacija.Services.Services
             return appointments;
         }
 
+        public async Task<List<AppointmentDTO>> GetApprovedAppointmentOfObject(string userId)
+        {
+            var objectIds = await _rekreacijaContext.Set<tbl_Objects>().Where(s => s.user_id == userId).Select(s => s.id).ToListAsync();
+
+            var appointments = await _rekreacijaContext.Set<tbl_Appointment>().Where(s => objectIds.Contains(s.object_id) && s.is_approved == true)
+                .Select(s => new AppointmentDTO
+                {
+                    id = s.id,
+                    appointment_date = s.appointment_date,
+                    start_time = s.start_time,
+                    end_time = s.end_time,
+                    object_id = s.object_id,
+                    user_id = s.user_id,
+                    is_approved = s.is_approved
+                }).ToListAsync();
+
+            var objects = await _rekreacijaContext.Set<tbl_Objects>().Where(o => objectIds.Contains(o.id))
+            .Select(o => new ObjectsDTO
+            {
+                id = o.id,
+                name = o.name
+            }).ToListAsync();
+
+            var obj = objects.ToDictionary(o => o.id, o => o);
+
+            var userIds = appointments.Select(a => a.user_id).Distinct().ToList();
+            var users = await _userManager.Users.Where(u => userIds.Contains(u.Id))
+          .Select(u => new ApplicationUserDTO
+          {
+              Id = u.Id,
+              FirstName = u.FirstName,
+              LastName = u.LastName,
+          }).ToListAsync();
+            var userDict = users.ToDictionary(u => u.Id, u => u);
+
+            foreach (var appointment in appointments)
+            {
+                if (obj.TryGetValue(appointment.object_id, out var objectsDTO))
+                    appointment.object_name = objectsDTO.name;
+
+                if (userDict.TryGetValue(appointment.user_id, out var userDTO))
+                    appointment.fullname = userDTO.FirstName + ' ' + userDTO.LastName;
+            }
+
+            return appointments;
+        }
+
         public async Task<bool> ApproveAppointment(int id)
         {
             var existing_appointment = await _rekreacijaContext.Set<tbl_Appointment>().Where(a => a.id == id).FirstOrDefaultAsync();
