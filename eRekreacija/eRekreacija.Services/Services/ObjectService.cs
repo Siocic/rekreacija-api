@@ -400,5 +400,41 @@ namespace eRekreacija.Services.Services
 
             return objects;
         }
+
+        public async Task<List<UserObjectCountDTO>> GetCountObjectPerUser()
+        {
+            var objectCounts = await _rekreacijaContext.TblObject
+                                                .GroupBy(o => o.user_id)
+                                                .Select(group => new
+                                                {
+                                                    UserId = group.Key,
+                                                    Count = group.Count()
+                                                })
+                                                .ToListAsync();
+
+            var userIds = objectCounts.Select(x => x.UserId).ToList();
+            var users = await _userManager.Users
+                                     .Where(u => userIds.Contains(u.Id))
+                                     .Select(u => new
+                                     {
+                                         u.Id,
+                                         FullName = u.FirstName + " " + u.LastName
+                                     })
+                                     .ToListAsync();
+
+            var result = objectCounts.Join(
+                                            users,
+                                            oc => oc.UserId,
+                                            u => u.Id,
+                                            (oc, u) => new UserObjectCountDTO
+                                            {
+                                                UserId = u.Id,
+                                                FullName = u.FullName,
+                                                ObjectCount = oc.Count
+                                            }).ToList();
+
+            return result;
+
+        }
     }
 }

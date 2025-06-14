@@ -104,5 +104,21 @@ namespace eRekreacijaAPI.Controllers
             }
 
         }
+
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpGet("getCountedObjectPerUser")]
+        public async Task<IActionResult> GetCountObjectPerUser()
+        {
+            try
+            {
+                var result = await _objectService.GetCountObjectPerUser();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+        }
     }
 }
