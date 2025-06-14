@@ -19,6 +19,8 @@ namespace eRekreacija.Services.Seeders
             await SeedSportCategoriesObjects(context);
             await SeedReview(context);
             await SeedNotification(context);
+            await SeedAppointments(context);
+
         }
         private static async Task SeedSuperAdmin(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
@@ -304,6 +306,68 @@ namespace eRekreacija.Services.Seeders
             await context.SaveChangesAsync();
 
             command.CommandText = "SET IDENTITY_INSERT tbl_Notification OFF";
+            await command.ExecuteNonQueryAsync();
+            await connection.CloseAsync();
+        }
+        private static async Task SeedAppointments(RekreacijaContext context)
+        {
+            var appointments = new List<tbl_Appointment>
+            {
+                new tbl_Appointment{id=1,appointment_date=new DateTime(2025,01,18),start_time=new DateTime(2025,01,18,12,00,00),end_time=new DateTime(2025,01,18,13,00,00),is_approved=true,object_id=1,user_id="326aa2d9-36a5-41e7-ab17-2339db9d7dbb"},
+                new tbl_Appointment{id=2,appointment_date=new DateTime(2025,01,18),start_time=new DateTime(2025,01,18,15,00,00),end_time=new DateTime(2025,01,18,16,00,00),is_approved=true,object_id=1,user_id="8b5f3087-4554-497f-9cd8-df61793e083a"},
+                new tbl_Appointment{id=3,appointment_date=new DateTime(2025,01,20),start_time=new DateTime(2025,01,20,12,00,00),end_time=new DateTime(2025,01,20,13,00,00),is_approved=true,object_id=1,user_id="ce9e09e0-29c7-4ef5-9a76-c020dae967f5"},
+                new tbl_Appointment{id=4,appointment_date=new DateTime(2025,01,25),start_time=new DateTime(2025,01,25,15,00,00),end_time=new DateTime(2025,01,25,17,00,00),is_approved=true,object_id=1,user_id="326aa2d9-36a5-41e7-ab17-2339db9d7dbb"},
+                new tbl_Appointment{id=5,appointment_date=new DateTime(2025,01,30),start_time=new DateTime(2025,01,30,19,00,00),end_time=new DateTime(2025,01,30,20,00,00),is_approved=true,object_id=1,user_id="8b5f3087-4554-497f-9cd8-df61793e083a"},
+                new tbl_Appointment{id=6,appointment_date=new DateTime(2025,02,02),start_time=new DateTime(2025,02,02,12,00,00),end_time=new DateTime(2025,01,18,13,00,00),is_approved=true,object_id=1,user_id="ce9e09e0-29c7-4ef5-9a76-c020dae967f5"},
+                new tbl_Appointment{id=7,appointment_date=new DateTime(2025,02,15),start_time=new DateTime(2025,02,15,14,00,00),end_time=new DateTime(2025,02,15,15,00,00),is_approved=true,object_id=1,user_id="8b5f3087-4554-497f-9cd8-df61793e083a"},
+                new tbl_Appointment{id=8,appointment_date=new DateTime(2025,02,25),start_time=new DateTime(2025,02,25,20,00,00),end_time=new DateTime(2025,02, 25,21,00,00),is_approved=true,object_id=1,user_id="326aa2d9-36a5-41e7-ab17-2339db9d7dbb"},
+                new tbl_Appointment{id=9,appointment_date=new DateTime(2025,03,10),start_time=new DateTime(2025,03,10,20,00,00),end_time=new DateTime(2025,03,10,21,00,00),is_approved=true,object_id=1,user_id="326aa2d9-36a5-41e7-ab17-2339db9d7dbb"},
+                new tbl_Appointment{id=10,appointment_date=new DateTime(2025,03,15),start_time=new DateTime(2025,03,15,16,00,00),end_time=new DateTime(2025,03,15,17,00,00),is_approved=true,object_id=1,user_id="8b5f3087-4554-497f-9cd8-df61793e083a"},
+                new tbl_Appointment{id=11,appointment_date=new DateTime(2025,03,25),start_time=new DateTime(2025,03,25,12,00,00),end_time=new DateTime(2025,03, 25,13,00,00),is_approved=true,object_id=1,user_id="ce9e09e0-29c7-4ef5-9a76-c020dae967f5"},
+                new tbl_Appointment{id=12,appointment_date=new DateTime(2025,04,05),start_time=new DateTime(2025,04,05,17,30,00),end_time=new DateTime(2025,04,05,18,30,00),is_approved=true,object_id=1,user_id="ce9e09e0-29c7-4ef5-9a76-c020dae967f5"},
+                new tbl_Appointment{id=13,appointment_date=new DateTime(2025,04, 25),start_time=new DateTime(2025,04, 25,18,00,00),end_time=new DateTime(2025,04, 25,19,00,00),is_approved=true,object_id=1,user_id="ce9e09e0-29c7-4ef5-9a76-c020dae967f5"},
+                new tbl_Appointment{id=14,appointment_date=new DateTime(2025,05,05),start_time=new DateTime(2025,05,05,20,00,00),end_time=new DateTime(2025,05,05,21,00,00),is_approved=true,object_id=1,user_id="8b5f3087-4554-497f-9cd8-df61793e083a"},
+                new tbl_Appointment{id=15,appointment_date=new DateTime(2025,05,15),start_time=new DateTime(2025,05,15,15,00,00),end_time=new DateTime(2025,05, 15,16,00,00),is_approved=true,object_id=1,user_id="326aa2d9-36a5-41e7-ab17-2339db9d7dbb"},
+
+
+                new tbl_Appointment{id=16,appointment_date=new DateTime(2025,05,15),start_time=new DateTime(2025,05,15,19,00,00),end_time=new DateTime(2025,05, 15,20,00,00),is_approved=true,object_id=3,user_id="2a38f91f-00fe-4161-b694-77f30f1d4036"},
+                new tbl_Appointment{id=17,appointment_date=new DateTime(2025,04,20),start_time=new DateTime(2025,04,20,18,00,00),end_time=new DateTime(2025,04, 20,20,00,00),is_approved=true,object_id=3,user_id="8b5f3087-4554-497f-9cd8-df61793e083a"},
+                new tbl_Appointment{id=18,appointment_date=new DateTime(2025,05,17),start_time=new DateTime(2025,05,17,17,00,00),end_time=new DateTime(2025,05, 17,18,00,00),is_approved=true,object_id=3,user_id="326aa2d9-36a5-41e7-ab17-2339db9d7dbb"},
+                new tbl_Appointment{id=19,appointment_date=new DateTime(2025,05,10),start_time=new DateTime(2025,05,10,19,00,00),end_time=new DateTime(2025,05, 10,20,00,00),is_approved=true,object_id=3,user_id="ce9e09e0-29c7-4ef5-9a76-c020dae967f5"},
+                new tbl_Appointment{id=20,appointment_date=new DateTime(2025,05,18),start_time=new DateTime(2025,05,18,18,00,00),end_time=new DateTime(2025,05, 18,19,00,00),is_approved=true,object_id=3,user_id="2a38f91f-00fe-4161-b694-77f30f1d4036"},
+
+                new tbl_Appointment{id=21,appointment_date=new DateTime(2025,04,20),start_time=new DateTime(2025,04,20,18,00,00),end_time=new DateTime(2025,04, 20,19,00,00),is_approved=true,object_id=2,user_id="2a38f91f-00fe-4161-b694-77f30f1d4036"},
+                new tbl_Appointment{id=22,appointment_date=new DateTime(2025,05,15),start_time=new DateTime(2025,05,15,18,00,00),end_time=new DateTime(2025,05, 15,19,00,00),is_approved=true,object_id=2,user_id="ce9e09e0-29c7-4ef5-9a76-c020dae967f5"},
+                new tbl_Appointment{id=23,appointment_date=new DateTime(2025,05,10),start_time=new DateTime(2025,05,10,18,00,00),end_time=new DateTime(2025,05, 10,19,00,00),is_approved=true,object_id=2,user_id="8b5f3087-4554-497f-9cd8-df61793e083a"},
+
+                new tbl_Appointment{id=24,appointment_date=new DateTime(2025,02,10),start_time=new DateTime(2025,02,10,18,00,00),end_time=new DateTime(2025,02, 10,19,00,00),is_approved=true,object_id=5,user_id="ce9e09e0-29c7-4ef5-9a76-c020dae967f5"},
+                new tbl_Appointment{id=25,appointment_date=new DateTime(2025,03,20),start_time=new DateTime(2025,03,20,17,00,00),end_time=new DateTime(2025,03, 20,18,00,00),is_approved=true,object_id=5,user_id="8b5f3087-4554-497f-9cd8-df61793e083a"},
+
+                new tbl_Appointment{id=26,appointment_date=new DateTime(2025,02,12),start_time=new DateTime(2025,02,12,19,00,00),end_time=new DateTime(2025,02, 12,20,00,00),is_approved=true,object_id=6,user_id="326aa2d9-36a5-41e7-ab17-2339db9d7dbb"},
+                new tbl_Appointment{id=27,appointment_date=new DateTime(2025,04,08),start_time=new DateTime(2025,04,08,17,00,00),end_time=new DateTime(2025,04, 08,18,00,00),is_approved=true,object_id=6,user_id="2a38f91f-00fe-4161-b694-77f30f1d4036"},
+                new tbl_Appointment{id=28,appointment_date=new DateTime(2025,02,10),start_time=new DateTime(2025,02,10,17,00,00),end_time=new DateTime(2025,02, 10,18,00,00),is_approved=true,object_id=6,user_id="2a38f91f-00fe-4161-b694-77f30f1d4036"},
+
+                new tbl_Appointment{id=29,appointment_date=new DateTime(2025,05,15),start_time=new DateTime(2025,05,15,16,00,00),end_time=new DateTime(2025,05, 15,18,00,00),is_approved=true,object_id=7,user_id="8b5f3087-4554-497f-9cd8-df61793e083a"},
+                new tbl_Appointment{id=30,appointment_date=new DateTime(2025,03,10),start_time=new DateTime(2025,03,10,18,00,00),end_time=new DateTime(2025,03, 10,19,00,00),is_approved=true,object_id=8,user_id="2a38f91f-00fe-4161-b694-77f30f1d4036"},
+            };
+
+            var connection = context.Database.GetDbConnection();
+            await connection.OpenAsync();
+            var command = connection.CreateCommand();
+
+            command.CommandText = "SET IDENTITY_INSERT tbl_Appointment ON";
+            await command.ExecuteNonQueryAsync();
+
+            foreach (var n in appointments)
+            {
+                if (!context.TblAppointment.Any(c => c.id == n.id))
+                {
+                    context.TblAppointment.Add(n);
+                }
+            }
+            await context.SaveChangesAsync();
+
+            command.CommandText = "SET IDENTITY_INSERT tbl_Appointment OFF";
             await command.ExecuteNonQueryAsync();
             await connection.CloseAsync();
         }
