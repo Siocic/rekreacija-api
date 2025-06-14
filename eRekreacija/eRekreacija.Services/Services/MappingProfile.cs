@@ -3,16 +3,17 @@ using eRekreacija.Services.Database;
 using eRekreacija.Models.Models;
 using eRekreacija.Services.Database.Entities;
 using eRekreacija.Models.DTOs;
+using eRekreacijaAPI.DTOs;
 
 namespace eRekreacija.Services.Services
 {
-    public class MappingProfile:Profile
+    public class MappingProfile: Profile
     {
         public MappingProfile()
         {
             CreateMap<ApplicationUser, RegisterRequest>();
             CreateMap<RegisterRequest, ApplicationUser>();
-            CreateMap<tbl_SportCategory,SportCategoryDTO>().ReverseMap();
+            CreateMap<tbl_SportCategory, SportCategoryDTO>().ReverseMap();
 
             #region MAPPING-PROFILES-FOR-OBJECTS
             CreateMap<tbl_Objects, ObjectsDTO>().ReverseMap();
@@ -21,7 +22,7 @@ namespace eRekreacija.Services.Services
             #endregion
 
             #region MAPPING-PROFILES-FOR-NOTIFICATIONS
-            CreateMap<tbl_Notification,NotificationDTO>().ReverseMap();
+            CreateMap<tbl_Notification, NotificationDTO>().ReverseMap();
             CreateMap<NotificationInsertRequest, tbl_Notification>();
             #endregion
 
@@ -44,6 +45,13 @@ namespace eRekreacija.Services.Services
             #region MAPPING-PROFILES-FOR-CHAT
             CreateMap<ChatMessageDTO, tbl_ChatMessage>();
             CreateMap<tbl_ChatMessage, ChatMessageDTO>();
+            #endregion
+
+            #region MAPPING-PROFILES-FOR-HOLIDAY
+            CreateMap<HolidayDTO, tbl_Holiday>();
+            CreateMap<tbl_Holiday, HolidayDTO>();
+            CreateMap<ObjectHolidayDTO, tbl_ObjectHoliday>();
+            CreateMap<tbl_ObjectHoliday, ObjectHolidayDTO>();
             #endregion
         }
     }

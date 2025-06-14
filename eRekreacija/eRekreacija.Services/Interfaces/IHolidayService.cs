@@ -5,7 +5,10 @@ namespace eRekreacijaAPI.Services.Interfaces
 {
     public interface IHolidayService
     {
-        Task<tbl_Holiday> AddHolidayAsync(HolidayDTO dto);
+        Task<HolidayDTO> AddHolidayAsync(HolidayDTO dto);
         Task<tbl_ObjectHoliday?> AddObjectHolidayAsync(ObjectHolidayDTO dto);
+        Task<List<HolidayDTO>> GetAllHolidaysAsync();
+        Task<List<HolidayDTO>> GetHolidaysByObjectIdAsync(int objectId);
+
     }
 }

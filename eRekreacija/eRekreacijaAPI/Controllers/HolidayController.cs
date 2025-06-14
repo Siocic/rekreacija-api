@@ -30,5 +30,19 @@ namespace eRekreacijaAPI.Controllers
                 return BadRequest("Holiday already assigned to this object.");
             return Ok(result);
         }
+
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetAll()
+        {
+            var holidays = await _holidayService.GetAllHolidaysAsync();
+            return Ok(holidays);
+        }
+
+        [HttpGet("GetByObject/{objectId}")]
+        public async Task<IActionResult> GetByObject(int objectId)
+        {
+            var holidays = await _holidayService.GetHolidaysByObjectIdAsync(objectId);
+            return Ok(holidays);
+        }
     }
 }
