@@ -21,6 +21,7 @@ namespace eRekreacija.Services.Seeders
             await SeedNotification(context);
             await SeedAppointments(context);
             await SeedPayments(context);
+            await SeedFavorites(context);
         }
         private static async Task SeedSuperAdmin(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
@@ -390,27 +391,27 @@ namespace eRekreacija.Services.Seeders
                new tbl_Payment{id=13,amount=100,paid_date=new DateTime(2025,04, 25),user_id="ce9e09e0-29c7-4ef5-9a76-c020dae967f5",appointment_id=13,object_id=1},
                new tbl_Payment{id=14,amount=100,paid_date=new DateTime(2025,05,05),user_id="8b5f3087-4554-497f-9cd8-df61793e083a",appointment_id=14,object_id=1},
                new tbl_Payment{id=15,amount=100,paid_date=new DateTime(2025,05,15),user_id="326aa2d9-36a5-41e7-ab17-2339db9d7dbb",appointment_id=15,object_id=1},
-            
+
                new tbl_Payment{id=16,amount=80,paid_date=new DateTime(2025,05,15),user_id="2a38f91f-00fe-4161-b694-77f30f1d4036",appointment_id=16,object_id=3},
                new tbl_Payment{id=17,amount=80,paid_date=new DateTime(2025,04,20),user_id="8b5f3087-4554-497f-9cd8-df61793e083a",appointment_id=17,object_id=3},
                new tbl_Payment{id=18,amount=80,paid_date=new DateTime(2025,05,17),user_id="326aa2d9-36a5-41e7-ab17-2339db9d7dbb",appointment_id=18,object_id=3},
                new tbl_Payment{id=19,amount=80,paid_date=new DateTime(2025,05,10),user_id="ce9e09e0-29c7-4ef5-9a76-c020dae967f5",appointment_id=19,object_id=3},
                new tbl_Payment{id=20,amount=80,paid_date=new DateTime(2025,05,18),user_id="2a38f91f-00fe-4161-b694-77f30f1d4036",appointment_id=20,object_id=3},
-            
+
                new tbl_Payment{id=21,amount=100,paid_date=new DateTime(2025,04,20),user_id="2a38f91f-00fe-4161-b694-77f30f1d4036",appointment_id=21,object_id=2},
                new tbl_Payment{id=22,amount=100,paid_date=new DateTime(2025,05,15),user_id="ce9e09e0-29c7-4ef5-9a76-c020dae967f5",appointment_id=22,object_id=2},
                new tbl_Payment{id=23,amount=100,paid_date=new DateTime(2025,05,10),user_id="8b5f3087-4554-497f-9cd8-df61793e083a",appointment_id=23,object_id=2},
-            
+
                new tbl_Payment{id=24,amount=60,paid_date=new DateTime(2025,02,10),user_id="ce9e09e0-29c7-4ef5-9a76-c020dae967f5",appointment_id=24,object_id=5},
                new tbl_Payment{id=25,amount=60,paid_date=new DateTime(2025,03,20),user_id="8b5f3087-4554-497f-9cd8-df61793e083a",appointment_id=25,object_id=5},
-            
+
                new tbl_Payment{id=26,amount=50,paid_date=new DateTime(2025,02,12),user_id="326aa2d9-36a5-41e7-ab17-2339db9d7dbb",appointment_id=26,object_id=6},
                new tbl_Payment{id=27,amount=50,paid_date=new DateTime(2025,04,08),user_id="2a38f91f-00fe-4161-b694-77f30f1d4036",appointment_id=27,object_id=6},
                new tbl_Payment{id=28,amount=50,paid_date=new DateTime(2025,02,10),user_id="2a38f91f-00fe-4161-b694-77f30f1d4036",appointment_id=28,object_id=6},
-            
+
                new tbl_Payment{id=29,amount=200,paid_date=new DateTime(2025,05,15),user_id="8b5f3087-4554-497f-9cd8-df61793e083a",appointment_id=29,object_id=7},
                new tbl_Payment{id=30,amount=80,paid_date=new DateTime(2025,03,10),user_id="2a38f91f-00fe-4161-b694-77f30f1d4036",appointment_id=30,object_id=8},
-            
+
             };
             var connection = context.Database.GetDbConnection();
             await connection.OpenAsync();
@@ -431,6 +432,33 @@ namespace eRekreacija.Services.Seeders
             command.CommandText = "SET IDENTITY_INSERT tbl_Payment OFF";
             await command.ExecuteNonQueryAsync();
             await connection.CloseAsync();
+        }
+        private static async Task SeedFavorites(RekreacijaContext context)
+        {
+            var favorites = new List<tbl_Favorites>
+            {
+                new tbl_Favorites{object_id=1,user_id="326aa2d9-36a5-41e7-ab17-2339db9d7dbb"},
+                new tbl_Favorites{object_id=1,user_id="8b5f3087-4554-497f-9cd8-df61793e083a"},
+                new tbl_Favorites{object_id=1,user_id="ce9e09e0-29c7-4ef5-9a76-c020dae967f5"},
+                new tbl_Favorites{object_id=1,user_id="2a38f91f-00fe-4161-b694-77f30f1d4036"},
+                new tbl_Favorites{object_id=3,user_id="326aa2d9-36a5-41e7-ab17-2339db9d7dbb"},
+                new tbl_Favorites{object_id=3,user_id="8b5f3087-4554-497f-9cd8-df61793e083a"},
+                new tbl_Favorites{object_id=2,user_id="ce9e09e0-29c7-4ef5-9a76-c020dae967f5"},
+                new tbl_Favorites{object_id=5,user_id="2a38f91f-00fe-4161-b694-77f30f1d4036"},
+                new tbl_Favorites{object_id=3,user_id="ce9e09e0-29c7-4ef5-9a76-c020dae967f5"},
+                new tbl_Favorites{object_id=6,user_id="ce9e09e0-29c7-4ef5-9a76-c020dae967f5"},
+                new tbl_Favorites{object_id=7,user_id="2a38f91f-00fe-4161-b694-77f30f1d4036"},
+                new tbl_Favorites{object_id=8,user_id="326aa2d9-36a5-41e7-ab17-2339db9d7dbb"},
+                new tbl_Favorites{object_id=2,user_id="8b5f3087-4554-497f-9cd8-df61793e083a"},
+            };
+            foreach (var f in favorites)
+            {
+                if (!context.TblFavorite.Any(c => c.user_id == f.user_id && c.object_id == f.object_id))
+                {
+                    context.TblFavorite.Add(f);
+                }
+            }
+            await context.SaveChangesAsync();
         }
     }
 }
