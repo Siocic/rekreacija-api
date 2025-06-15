@@ -128,8 +128,14 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var rekreacijContext = scope.ServiceProvider.GetRequiredService<RekreacijaContext>();
+    var dataContext = scope.ServiceProvider.GetRequiredService<IdentityContext>();
     try
     {
+        //Migrate data
+        dataContext.Database.Migrate();
+        rekreacijContext.Database.Migrate();
+
+        //Seed data
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
         await DatabaseSeeder.SeedAsync(userManager, roleManager, rekreacijContext);
@@ -166,16 +172,16 @@ app.MapHub<ChatHub>("/chat");
 app.MapControllers();
 
 //Docker create migration
-using (var scope = app.Services.CreateScope())
-{
-    var dataContext = scope.ServiceProvider.GetRequiredService<IdentityContext>();
-    var rekreacijaContext = scope.ServiceProvider.GetService<RekreacijaContext>();
-    //dataContext.Database.EnsureCreated();
-    dataContext.Database.Migrate();
-    rekreacijaContext.Database.Migrate();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    await DatabaseSeeder.SeedAsync(userManager, roleManager, rekreacijaContext);
-}
+//using (var scope = app.Services.CreateScope())
+//{
+//    var dataContext = scope.ServiceProvider.GetRequiredService<IdentityContext>();
+//    var rekreacijaContext = scope.ServiceProvider.GetService<RekreacijaContext>();
+//    //dataContext.Database.EnsureCreated();
+//    dataContext.Database.Migrate();
+//    rekreacijaContext.Database.Migrate();
+//    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+//    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+//    await DatabaseSeeder.SeedAsync(userManager, roleManager, rekreacijaContext);
+//}
 
 app.Run();
