@@ -471,7 +471,7 @@ namespace eRekreacija.Services.Seeders
                 new tbl_Holiday{id = 3, name="Praznik rada", start_date=new DateTime(2025,05,01,00,00,00),end_date=new DateTime(2025,05,02,00,00,00)},
                 new tbl_Holiday{id = 4, name="Ramaznski bajram", start_date=new DateTime(2025,03,31,00,00,00),end_date=new DateTime(2025,03,31,00,00,00)},
                 new tbl_Holiday{id = 5, name="Kurban bajram", start_date=new DateTime(2025,06,06,00,00,00),end_date=new DateTime(2025,06,06,00,00,00)},
-                new tbl_Holiday{id = 6, name="Dan nezavisnosti", start_date=new DateTime(2025,06,06,00,00,00),end_date=new DateTime(2025,06,06,00,00,00)},
+                new tbl_Holiday{id = 6, name="Dan nezavisnosti", start_date=new DateTime(2025,03,01,00,00,00),end_date=new DateTime(2025,03,01,00,00,00)},
                 new tbl_Holiday{id = 7, name="Dan drzavnosti", start_date=new DateTime(2025,11,25,00,00,00),end_date=new DateTime(2025,11,25,00,00,00)},
                 new tbl_Holiday{id = 8, name="Godisnji odmor", start_date=new DateTime(2025,01,03,00,00,00),end_date=new DateTime(2025,03,31,00,00,00)},
                 new tbl_Holiday{id = 9, name="Kolektivni godisnji", start_date=new DateTime(2025,05,05,00,00,00),end_date=new DateTime(2025,05,16,00,00,00)},
