@@ -24,6 +24,7 @@ namespace eRekreacija.Services.Seeders
             await SeedFavorites(context);
             await SeedHolidays(context);
             await SeedObjectHoliday(context);
+            await SeedChatMessages(context);
         }
         private static async Task SeedSuperAdmin(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
@@ -573,6 +574,41 @@ namespace eRekreacija.Services.Seeders
                 }
             }
             await context.SaveChangesAsync();
+        }
+        private static async Task SeedChatMessages(RekreacijaContext context)
+        {
+            var chat_meesages = new List<tbl_ChatMessage>
+            {
+                new tbl_ChatMessage{Id=1,SenderId="326aa2d9-36a5-41e7-ab17-2339db9d7dbb",RecipientId="b3fd38e0-033f-4069-b068-415841a74e78",Content="Pozdrav",Timestamp=new DateTime(2025,06,14,16,00,00)},
+                new tbl_ChatMessage{Id=2,SenderId="b3fd38e0-033f-4069-b068-415841a74e78",RecipientId="326aa2d9-36a5-41e7-ab17-2339db9d7dbb",Content="Pozdrav",Timestamp=new DateTime(2025,06,14,16,05,00)},
+                new tbl_ChatMessage{Id=3,SenderId="8b5f3087-4554-497f-9cd8-df61793e083a",RecipientId="b3fd38e0-033f-4069-b068-415841a74e78",Content="Pozdrav",Timestamp=new DateTime(2025,01,30,16,00,00)},
+                new tbl_ChatMessage{Id=4,SenderId="b3fd38e0-033f-4069-b068-415841a74e78",RecipientId="8b5f3087-4554-497f-9cd8-df61793e083a",Content="Pozdrav",Timestamp=new DateTime(2025,01,30,16,05,00)},
+                new tbl_ChatMessage{Id=5,SenderId="ce9e09e0-29c7-4ef5-9a76-c020dae967f5",RecipientId="b3fd38e0-033f-4069-b068-415841a74e78",Content="Pozdrav",Timestamp=new DateTime(2025,03,25,16,00,00)},
+                new tbl_ChatMessage{Id=6,SenderId="b3fd38e0-033f-4069-b068-415841a74e78",RecipientId="ce9e09e0-29c7-4ef5-9a76-c020dae967f5",Content="Pozdrav",Timestamp=new DateTime(2025,03,25,16,05,00)},
+                new tbl_ChatMessage{Id=7,SenderId="8b5f3087-4554-497f-9cd8-df61793e083a",RecipientId="d4801fe1-11b2-43ba-9dbd-c0e59be103ca",Content="Pozdrav",Timestamp=new DateTime(2025,04,20,16,00,00)},
+                new tbl_ChatMessage{Id=8,SenderId="d4801fe1-11b2-43ba-9dbd-c0e59be103ca",RecipientId="8b5f3087-4554-497f-9cd8-df61793e083a",Content="Pozdrav",Timestamp=new DateTime(2025,04,20,16,05,00)},
+                new tbl_ChatMessage{Id=9,SenderId="326aa2d9-36a5-41e7-ab17-2339db9d7dbb",RecipientId="d4801fe1-11b2-43ba-9dbd-c0e59be103ca",Content="Pozdrav",Timestamp=new DateTime(2025,05,17,16,00,00)},
+                new tbl_ChatMessage{Id=10,SenderId="d4801fe1-11b2-43ba-9dbd-c0e59be103ca",RecipientId="326aa2d9-36a5-41e7-ab17-2339db9d7dbb",Content="Pozdrav",Timestamp=new DateTime(2025,05,17,16,05,00)},
+            };
+            var connection = context.Database.GetDbConnection();
+            await connection.OpenAsync();
+            var command = connection.CreateCommand();
+
+            command.CommandText = "SET IDENTITY_INSERT tbl_ChatMessage ON";
+            await command.ExecuteNonQueryAsync();
+
+            foreach (var mess in chat_meesages)
+            {
+                if (!context.TblChatMessages.Any(c => c.SenderId == mess.SenderId && c.RecipientId == mess.RecipientId))
+                {
+                    context.TblChatMessages.Add(mess);
+                }
+            }
+            await context.SaveChangesAsync();
+
+            command.CommandText = "SET IDENTITY_INSERT tbl_ChatMessage OFF";
+            await command.ExecuteNonQueryAsync();
+            await connection.CloseAsync();
         }
     }
 }
