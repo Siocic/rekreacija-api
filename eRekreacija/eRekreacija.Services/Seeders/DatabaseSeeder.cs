@@ -104,8 +104,8 @@ namespace eRekreacija.Services.Seeders
 
             var pravnoLice = new List<ApplicationUser>
             {
-                new ApplicationUser{Id="b3fd38e0-033f-4069-b068-415841a74e78", isApproved = true, UserName = "PravnoLice", Email = "pravnolice@email.com",FirstName = "Pravno", LastName = "Lice", Address = "Ulica bb", City = "Tuzla", PhoneNumber = "13579", EmailConfirmed = true, PhoneNumberConfirmed = true },
-                new ApplicationUser{Id="d42f255c-d841-4d09-8f6e-f195a1c98d10",isApproved = true, UserName ="Ishak",Email="ishak.isabegoic@edu.fit.ba",FirstName="Ishak",LastName="Isabegovic",Address="Ulica bb",City="Tuzla",PhoneNumber="32131", EmailConfirmed = true, PhoneNumberConfirmed = true },
+                new ApplicationUser{Id="b3fd38e0-033f-4069-b068-415841a74e78",isApproved = true, UserName = "PravnoLice", Email = "pravnolice@email.com",FirstName = "Pravno", LastName = "Lice", Address = "Ulica bb", City = "Tuzla", PhoneNumber = "13579", EmailConfirmed = true, PhoneNumberConfirmed = true },
+                new ApplicationUser{Id="d42f255c-d841-4d09-8f6e-f195a1c98d10",isApproved = true, UserName ="Ishak",Email="ishak.isabegovic@edu.fit.ba",FirstName="Ishak",LastName="Isabegovic",Address="Ulica bb",City="Tuzla",PhoneNumber="32131", EmailConfirmed = true, PhoneNumberConfirmed = true },
                 new ApplicationUser{Id="b86e93f5-b543-48eb-885f-ad0f8edbf257",isApproved = true, UserName ="Pero",Email="pero@email.com",FirstName="Pero",LastName="Peric",Address="Ulica bb",City="Tuzla",PhoneNumber="12123", EmailConfirmed = true, PhoneNumberConfirmed = true },
                 new ApplicationUser{Id="2960f5c7-e10c-489a-8958-df60e91b4469",isApproved=false,UserName="Karlo",Email="karlo@email.com",FirstName="Karlo",LastName="Ivic",Address="Ulica bb",City="Tuzla",PhoneNumber="4324234",EmailConfirmed=true,PhoneNumberConfirmed=true},
                 new ApplicationUser{Id="5af93ac0-389d-43ec-a6b7-ff58f1b4410c",isApproved = true, UserName ="Berun",Email="berun@email.com",FirstName="Berun",LastName="Agic",Address="Ulica bb",City="Tuzla",PhoneNumber="312414", EmailConfirmed = true, PhoneNumberConfirmed = true },
@@ -113,7 +113,7 @@ namespace eRekreacija.Services.Seeders
                 new ApplicationUser{Id="bae2b802-2b97-4332-8534-9526d602fb29",isApproved = true, UserName ="Adi",Email="adi@email.com",FirstName="Adi",LastName="Efendic",Address="Ulica bb",City="Tuzla",PhoneNumber="1423423", EmailConfirmed = true, PhoneNumberConfirmed = true },
                 new ApplicationUser{Id="84a4952f-20e4-40d8-bd0d-5534943ff3cb",isApproved = true, UserName ="Semir",Email="semir@email.com",FirstName="Semir",LastName="Nisic",Address="Ulica bb",City="Tuzla",PhoneNumber="3423423", EmailConfirmed = true, PhoneNumberConfirmed = true },
                 new ApplicationUser{Id="d4801fe1-11b2-43ba-9dbd-c0e59be103ca",isApproved = true, UserName ="Omer",Email="omer@email.com",FirstName="Omer",LastName="Mehanovic",Address="Ulica bb",City="Tuzla",PhoneNumber="423432", EmailConfirmed = true, PhoneNumberConfirmed = true },
-                new ApplicationUser{Id="4b1e8c22-4999-4fc8-9290-bee54506b376",isApproved = true, UserName ="Hamza",Email="hamza@email.com",FirstName="Hamaz",LastName="Husni",Address="Ulica bb",City="Tuzla",PhoneNumber="324324", EmailConfirmed = true, PhoneNumberConfirmed = true },
+                new ApplicationUser{Id="4b1e8c22-4999-4fc8-9290-bee54506b376",isApproved = true, UserName ="Hamza",Email="hamza@email.com",FirstName="Hamza",LastName="Husni",Address="Ulica bb",City="Tuzla",PhoneNumber="324324", EmailConfirmed = true, PhoneNumberConfirmed = true },
             };
 
             foreach (var pL in pravnoLice)
