@@ -136,12 +136,10 @@ using (var scope = app.Services.CreateScope())
         rekreacijContext.Database.Migrate();
 
         //Seed data
-        if(dataContext.Database.EnsureCreated() && rekreacijContext.Database.EnsureCreated())
-        {
-            var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-            await DatabaseSeeder.SeedAsync(userManager, roleManager, rekreacijContext);
-        }
+        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+        await DatabaseSeeder.SeedAsync(userManager, roleManager, rekreacijContext);
+
     }
     catch (Exception ex)
     {
