@@ -173,6 +173,9 @@ using (var scope = app.Services.CreateScope())
     //dataContext.Database.EnsureCreated();
     dataContext.Database.Migrate();
     rekreacijaContext.Database.Migrate();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    await DatabaseSeeder.SeedAsync(userManager, roleManager, rekreacijaContext);
 }
 
 app.Run();
