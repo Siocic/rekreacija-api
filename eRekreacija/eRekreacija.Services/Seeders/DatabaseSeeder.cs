@@ -231,7 +231,7 @@ namespace eRekreacija.Services.Seeders
 
             foreach (var so in sport_categoires_objects)
             {
-                if (!context.TblObjectSportCategory.Any(c => c.object_id == so.object_id && c.sport_category_id == c.sport_category_id))
+                if (!context.TblObjectSportCategory.Any(c => c.object_id == so.object_id && c.sport_category_id == so.sport_category_id))
                 {
                     context.TblObjectSportCategory.Add(so);
                 }
