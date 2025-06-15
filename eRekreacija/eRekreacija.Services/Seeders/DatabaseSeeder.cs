@@ -22,6 +22,8 @@ namespace eRekreacija.Services.Seeders
             await SeedAppointments(context);
             await SeedPayments(context);
             await SeedFavorites(context);
+            await SeedHolidays(context);
+            await SeedObjectHoliday(context);
         }
         private static async Task SeedSuperAdmin(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
@@ -456,6 +458,118 @@ namespace eRekreacija.Services.Seeders
                 if (!context.TblFavorite.Any(c => c.user_id == f.user_id && c.object_id == f.object_id))
                 {
                     context.TblFavorite.Add(f);
+                }
+            }
+            await context.SaveChangesAsync();
+        }
+        private static async Task SeedHolidays(RekreacijaContext context)
+        {
+            var holiday = new List<tbl_Holiday>
+            {
+                new tbl_Holiday{id = 1, name="Nova godina", start_date=new DateTime(2025,01,01,00,00,00),end_date=new DateTime(2025,01,02,00,00,00)},
+                new tbl_Holiday{id = 2, name="Bozicni praznici", start_date=new DateTime(2024,12,24,00,00,00),end_date=new DateTime(2025,01,02,00,00,00)},
+                new tbl_Holiday{id = 3, name="Praznik rada", start_date=new DateTime(2025,05,01,00,00,00),end_date=new DateTime(2025,05,02,00,00,00)},
+                new tbl_Holiday{id = 4, name="Ramaznski bajram", start_date=new DateTime(2025,03,31,00,00,00),end_date=new DateTime(2025,03,31,00,00,00)},
+                new tbl_Holiday{id = 5, name="Kurban bajram", start_date=new DateTime(2025,06,06,00,00,00),end_date=new DateTime(2025,06,06,00,00,00)},
+                new tbl_Holiday{id = 6, name="Dan nezavisnosti", start_date=new DateTime(2025,06,06,00,00,00),end_date=new DateTime(2025,06,06,00,00,00)},
+                new tbl_Holiday{id = 7, name="Dan drzavnosti", start_date=new DateTime(2025,11,25,00,00,00),end_date=new DateTime(2025,11,25,00,00,00)},
+                new tbl_Holiday{id = 8, name="Godisnji odmor", start_date=new DateTime(2025,01,03,00,00,00),end_date=new DateTime(2025,03,31,00,00,00)},
+                new tbl_Holiday{id = 9, name="Kolektivni godisnji", start_date=new DateTime(2025,05,05,00,00,00),end_date=new DateTime(2025,05,16,00,00,00)},
+                new tbl_Holiday{id = 10, name="Kolektivni godisnji", start_date=new DateTime(2025,07,07,00,00,00),end_date=new DateTime(2025,07,18,00,00,00)},
+            };
+            var connection = context.Database.GetDbConnection();
+            await connection.OpenAsync();
+            var command = connection.CreateCommand();
+
+            command.CommandText = "SET IDENTITY_INSERT tbl_Holiday ON";
+            await command.ExecuteNonQueryAsync();
+
+            foreach (var h in holiday)
+            {
+                if (!context.TblHoliday.Any(c => c.id == h.id))
+                {
+                    context.TblHoliday.Add(h);
+                }
+            }
+            await context.SaveChangesAsync();
+
+            command.CommandText = "SET IDENTITY_INSERT tbl_Holiday OFF";
+            await command.ExecuteNonQueryAsync();
+            await connection.CloseAsync();
+        }
+        private static async Task SeedObjectHoliday(RekreacijaContext context)
+        {
+            var object_holiday = new List<tbl_ObjectHoliday>
+            {
+                new tbl_ObjectHoliday{holiday_id=1,object_id=1},
+                new tbl_ObjectHoliday{holiday_id=1,object_id=2},
+                new tbl_ObjectHoliday{holiday_id=1,object_id=3},
+                new tbl_ObjectHoliday{holiday_id=1,object_id=4},
+                new tbl_ObjectHoliday{holiday_id=1,object_id=5},
+                new tbl_ObjectHoliday{holiday_id=1,object_id=6},
+                new tbl_ObjectHoliday{holiday_id=1,object_id=7},
+                new tbl_ObjectHoliday{holiday_id=1,object_id=9},
+                new tbl_ObjectHoliday{holiday_id=1,object_id=10},
+                new tbl_ObjectHoliday{holiday_id=2,object_id=8},
+                new tbl_ObjectHoliday{holiday_id=3,object_id=1},
+                new tbl_ObjectHoliday{holiday_id=3,object_id=2},
+                new tbl_ObjectHoliday{holiday_id=3,object_id=3},
+                new tbl_ObjectHoliday{holiday_id=3,object_id=4},
+                new tbl_ObjectHoliday{holiday_id=3,object_id=5},
+                new tbl_ObjectHoliday{holiday_id=3,object_id=6},
+                new tbl_ObjectHoliday{holiday_id=3,object_id=7},
+                new tbl_ObjectHoliday{holiday_id=3,object_id=8},
+                new tbl_ObjectHoliday{holiday_id=3,object_id=9},
+                new tbl_ObjectHoliday{holiday_id=3,object_id=10},
+                new tbl_ObjectHoliday{holiday_id=4,object_id=1},
+                new tbl_ObjectHoliday{holiday_id=4,object_id=2},
+                new tbl_ObjectHoliday{holiday_id=4,object_id=3},
+                new tbl_ObjectHoliday{holiday_id=4,object_id=4},
+                new tbl_ObjectHoliday{holiday_id=4,object_id=5},
+                new tbl_ObjectHoliday{holiday_id=4,object_id=6},
+                new tbl_ObjectHoliday{holiday_id=4,object_id=7},
+                new tbl_ObjectHoliday{holiday_id=4,object_id=9},
+                new tbl_ObjectHoliday{holiday_id=4,object_id=10},
+                new tbl_ObjectHoliday{holiday_id=5,object_id=1},
+                new tbl_ObjectHoliday{holiday_id=5,object_id=2},
+                new tbl_ObjectHoliday{holiday_id=5,object_id=3},
+                new tbl_ObjectHoliday{holiday_id=5,object_id=4},
+                new tbl_ObjectHoliday{holiday_id=5,object_id=5},
+                new tbl_ObjectHoliday{holiday_id=5,object_id=6},
+                new tbl_ObjectHoliday{holiday_id=5,object_id=7},
+                new tbl_ObjectHoliday{holiday_id=5,object_id=9},
+                new tbl_ObjectHoliday{holiday_id=5,object_id=10},
+                new tbl_ObjectHoliday{holiday_id=6,object_id=1},
+                new tbl_ObjectHoliday{holiday_id=6,object_id=2},
+                new tbl_ObjectHoliday{holiday_id=6,object_id=3},
+                new tbl_ObjectHoliday{holiday_id=6,object_id=4},
+                new tbl_ObjectHoliday{holiday_id=6,object_id=5},
+                new tbl_ObjectHoliday{holiday_id=6,object_id=6},
+                new tbl_ObjectHoliday{holiday_id=6,object_id=7},
+                new tbl_ObjectHoliday{holiday_id=6,object_id=8},
+                new tbl_ObjectHoliday{holiday_id=6,object_id=9},
+                new tbl_ObjectHoliday{holiday_id=6,object_id=10},
+                new tbl_ObjectHoliday{holiday_id=7,object_id=1},
+                new tbl_ObjectHoliday{holiday_id=7,object_id=2},
+                new tbl_ObjectHoliday{holiday_id=7,object_id=3},
+                new tbl_ObjectHoliday{holiday_id=7,object_id=4},
+                new tbl_ObjectHoliday{holiday_id=7,object_id=5},
+                new tbl_ObjectHoliday{holiday_id=7,object_id=6},
+                new tbl_ObjectHoliday{holiday_id=7,object_id=7},
+                new tbl_ObjectHoliday{holiday_id=7,object_id=8},
+                new tbl_ObjectHoliday{holiday_id=7,object_id=9},
+                new tbl_ObjectHoliday{holiday_id=7,object_id=10},
+                new tbl_ObjectHoliday{holiday_id=8,object_id=7},
+                new tbl_ObjectHoliday{holiday_id=8,object_id=9},
+                new tbl_ObjectHoliday{holiday_id=9,object_id=1},
+                new tbl_ObjectHoliday{holiday_id=10,object_id=4},
+            };
+
+            foreach (var so in object_holiday)
+            {
+                if (!context.TblObjectHoliday.Any(c => c.object_id == so.object_id && c.holiday_id == so.holiday_id))
+                {
+                    context.TblObjectHoliday.Add(so);
                 }
             }
             await context.SaveChangesAsync();
