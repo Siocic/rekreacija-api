@@ -346,8 +346,11 @@ namespace eRekreacija.Services.Services
             var reservation = await _rekreacijaContext.Set<tbl_Appointment>().Where(s => s.user_id == userId && s.appointment_date >= DateTime.Now).Select(s => new MyReservationDTO
             {
                 AppointmentDate = s.appointment_date,
+                AppointmentEndDate = s.end_time,
                 object_id = s.object_id,
                 is_approved = s.is_approved,
+                number_of_players = s.number_of_players,
+                price = s.TblPayment.amount
             }).ToListAsync();
 
             var objectIds = reservation.Select(s => s.object_id).Distinct().ToList();
