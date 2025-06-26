@@ -343,10 +343,11 @@ namespace eRekreacija.Services.Services
 
         public async Task<List<MyReservationDTO>> GetMyReservation(string userId)
         {
-            var reservation = await _rekreacijaContext.Set<tbl_Appointment>().Where(s => s.user_id == userId && s.is_approved == true && s.appointment_date >= DateTime.Now).Select(s => new MyReservationDTO
+            var reservation = await _rekreacijaContext.Set<tbl_Appointment>().Where(s => s.user_id == userId && s.appointment_date >= DateTime.Now).Select(s => new MyReservationDTO
             {
                 AppointmentDate = s.appointment_date,
-                object_id = s.object_id
+                object_id = s.object_id,
+                is_approved = s.is_approved,
             }).ToListAsync();
 
             var objectIds = reservation.Select(s => s.object_id).Distinct().ToList();

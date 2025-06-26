@@ -7,5 +7,6 @@
         public string ObjectImage { get;set; }
         public DateTime? AppointmentDate { get; set; }
         public int object_id { get; set; }
+        public bool? is_approved { get; set; }
     }
 }
