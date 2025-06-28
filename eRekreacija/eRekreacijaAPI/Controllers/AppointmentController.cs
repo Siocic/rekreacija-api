@@ -113,6 +113,21 @@ namespace eRekreacijaAPI.Controllers
         }
 
         [Authorize(AuthenticationSchemes = "Bearer")]
+        [HttpGet("GetMyReservationHistory")]
+        public async Task<IActionResult> GetMyReservationHistory()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+                return Unauthorized();
+
+            var result = await _appointmentService.GetMyReservationHistory(userId);
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
+
+        [Authorize(AuthenticationSchemes = "Bearer")]
         [HttpGet("GetReservedTimes")]
         public async Task<IActionResult> GetReservedTimes(int objectId, DateTime? startTime, DateTime? endTime)
         {

@@ -375,6 +375,40 @@ namespace eRekreacija.Services.Services
 
             return reservation;
         }
+        public async Task<List<MyReservationDTO>> GetMyReservationHistory(string userId)
+        {
+            var reservation = await _rekreacijaContext.Set<tbl_Appointment>().Where(s => s.user_id == userId && s.is_approved==true &&s.appointment_date <= DateTime.Now).Select(s => new MyReservationDTO
+            {
+                AppointmentDate = s.appointment_date,
+                AppointmentEndDate = s.end_time,
+                object_id = s.object_id,
+                is_approved = s.is_approved,
+                number_of_players = s.number_of_players,
+                price = s.TblPayment.amount
+            }).ToListAsync();
+
+            var objectIds = reservation.Select(s => s.object_id).Distinct().ToList();
+            var objects = await _rekreacijaContext.Set<tbl_Objects>().Where(s => objectIds.Contains(s.id)).Select(s => new
+            {
+                Id = s.id,
+                ObjectName = s.name,
+                ObjectAdress = s.address,
+                ObjectImage = s.ImagePath
+            }).ToListAsync();
+            var obj = objects.ToDictionary(o => o.Id, o => o);
+
+            foreach (var r in reservation)
+            {
+                if (obj.TryGetValue(r.object_id, out var o))
+                {
+                    r.ObjectAdress = o.ObjectAdress;
+                    r.ObjectName = o.ObjectName;
+                    r.ObjectImage = o.ObjectImage;
+                }
+            }
+
+            return reservation;
+        }
 
         public async Task<bool> GetReservedTimes(int objectId, DateTime? startTime, DateTime? endTime)
         {

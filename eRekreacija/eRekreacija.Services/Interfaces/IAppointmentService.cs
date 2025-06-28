@@ -11,6 +11,7 @@ namespace eRekreacija.Services.Interfaces
         Task<List<MyClientsDTO>> GetMyClients(string userId);
         Task<List<MyClientPayments>>GetMyClientPayments(string userId);
         Task<List<MyReservationDTO>> GetMyReservation(string userId);
+        Task<List<MyReservationDTO>> GetMyReservationHistory(string userId);
         Task<bool> GetReservedTimes(int objectId, DateTime? startTime,DateTime? endTime);
     }
 }
