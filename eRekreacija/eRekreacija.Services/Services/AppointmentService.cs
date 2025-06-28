@@ -346,6 +346,7 @@ namespace eRekreacija.Services.Services
             var reservation = await _rekreacijaContext.Set<tbl_Appointment>().Where(s => s.user_id == userId && s.appointment_date >= DateTime.Now).Select(s => new MyReservationDTO
             {
                 AppointmentDate = s.appointment_date,
+                AppointmentStartDate = s.start_time,
                 AppointmentEndDate = s.end_time,
                 object_id = s.object_id,
                 is_approved = s.is_approved,
@@ -380,6 +381,7 @@ namespace eRekreacija.Services.Services
             var reservation = await _rekreacijaContext.Set<tbl_Appointment>().Where(s => s.user_id == userId && s.is_approved==true &&s.appointment_date <= DateTime.Now).Select(s => new MyReservationDTO
             {
                 AppointmentDate = s.appointment_date,
+                AppointmentStartDate = s.start_time,
                 AppointmentEndDate = s.end_time,
                 object_id = s.object_id,
                 is_approved = s.is_approved,
