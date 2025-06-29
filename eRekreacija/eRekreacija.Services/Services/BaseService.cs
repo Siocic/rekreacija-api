@@ -7,24 +7,24 @@ namespace eRekreacija.Services.Services
 {
     public abstract class BaseService<TModel,TModelDTO>: IService<TModelDTO> where TModel : class where TModelDTO : class
     {
-        protected readonly RekreacijaContext _rekreacijaContext;
+        protected readonly IdentityContext _identityContext;
         protected readonly IMapper _mapper;
 
-        public BaseService(RekreacijaContext rekreacijaContext,IMapper mapper)
+        public BaseService(IdentityContext identityContext,IMapper mapper)
         {
             _mapper = mapper;
-            _rekreacijaContext = rekreacijaContext;
+            _identityContext = identityContext;
         }
 
         public virtual async Task<List<TModelDTO>> Get()
         {
-           var entities= await _rekreacijaContext.Set<TModel>().ToListAsync();
+           var entities= await _identityContext.Set<TModel>().ToListAsync();
             return _mapper.Map<List<TModelDTO>>(entities);    
         }
 
         public TModelDTO GetById(int id)
         {
-            var entity = _rekreacijaContext.Set<TModel>().Find(id);
+            var entity = _identityContext.Set<TModel>().Find(id);
             if(entity!=null)
             {
                 return _mapper.Map<TModelDTO>(entity);

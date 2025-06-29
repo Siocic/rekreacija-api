@@ -19,7 +19,7 @@ namespace eRekreacija.Services.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHostingEnvironment _host;
 
-        public ObjectService(RekreacijaContext rekreacijaContext, IMapper mapper, UserManager<ApplicationUser> userManager, IHostingEnvironment host) : base(rekreacijaContext, mapper)
+        public ObjectService(IdentityContext identityContext, IMapper mapper, UserManager<ApplicationUser> userManager, IHostingEnvironment host) : base(identityContext, mapper)
         {
             _host = host;
             _userManager = userManager;
@@ -73,18 +73,18 @@ namespace eRekreacija.Services.Services
                         object_id = entity.id,
                         sport_category_id = id
                     };
-                    await _rekreacijaContext.Set<tbl_ObjectSportCategory>().AddAsync(objectSportCategory);
+                    await _identityContext.Set<tbl_ObjectSportCategory>().AddAsync(objectSportCategory);
                 }
 
-                await _rekreacijaContext.SaveChangesAsync();
+                await _identityContext.SaveChangesAsync();
             }
         }
         public override async Task BeforeUpdate(tbl_Objects entity, ObjectUpdateRequest update)
         {
-            var findSportsId = _rekreacijaContext.Set<tbl_ObjectSportCategory>().Where(s => s.object_id == entity.id).ToList();
+            var findSportsId = _identityContext.Set<tbl_ObjectSportCategory>().Where(s => s.object_id == entity.id).ToList();
             if (findSportsId.Count() != 0)
             {
-                _rekreacijaContext.RemoveRange(findSportsId);
+                _identityContext.RemoveRange(findSportsId);
 
                 if (update.sportId != null && update.sportId.Any())
                 {
@@ -95,10 +95,10 @@ namespace eRekreacija.Services.Services
                             object_id = entity.id,
                             sport_category_id = id
                         };
-                        await _rekreacijaContext.Set<tbl_ObjectSportCategory>().AddAsync(objectSportCategory);
+                        await _identityContext.Set<tbl_ObjectSportCategory>().AddAsync(objectSportCategory);
                     }
 
-                    await _rekreacijaContext.SaveChangesAsync();
+                    await _identityContext.SaveChangesAsync();
                 }
             }
             else
@@ -112,10 +112,10 @@ namespace eRekreacija.Services.Services
                             object_id = entity.id,
                             sport_category_id = id
                         };
-                        await _rekreacijaContext.Set<tbl_ObjectSportCategory>().AddAsync(objectSportCategory);
+                        await _identityContext.Set<tbl_ObjectSportCategory>().AddAsync(objectSportCategory);
                     }
 
-                    await _rekreacijaContext.SaveChangesAsync();
+                    await _identityContext.SaveChangesAsync();
                 }
             }
             await base.BeforeUpdate(entity, update);
@@ -132,7 +132,7 @@ namespace eRekreacija.Services.Services
         {
             var user = _userManager.FindByIdAsync(userId);
 
-            var objects = await _rekreacijaContext.TblObject.Where(s => s.user_id == userId).OrderByDescending(s => s.created_date).Include(s => s.ObjectSportCategory).ToListAsync();
+            var objects = await _identityContext.TblObject.Where(s => s.user_id == userId).OrderByDescending(s => s.created_date).Include(s => s.ObjectSportCategory).ToListAsync();
 
             var objectDTO = objects.Select(obj => new ObjectsDTO
             {
@@ -151,11 +151,11 @@ namespace eRekreacija.Services.Services
 
         public async Task<List<ObjectsDTO>> GetObjectByCategory(string userId, int categoryId, string? name = null)
         {
-            var objectsIds = await _rekreacijaContext.Set<tbl_ObjectSportCategory>().Where(s => s.sport_category_id == categoryId).Select(s => s.object_id).ToListAsync();
+            var objectsIds = await _identityContext.Set<tbl_ObjectSportCategory>().Where(s => s.sport_category_id == categoryId).Select(s => s.object_id).ToListAsync();
 
-            var userFavorites = await _rekreacijaContext.Set<tbl_Favorites>().Where(f => f.user_id == userId).Select(f => f.object_id).ToListAsync();
+            var userFavorites = await _identityContext.Set<tbl_Favorites>().Where(f => f.user_id == userId).Select(f => f.object_id).ToListAsync();
 
-            var objectsDTO = await _rekreacijaContext.Set<tbl_Objects>()
+            var objectsDTO = await _identityContext.Set<tbl_Objects>()
                                .Where(s => objectsIds.Contains(s.id) && (string.IsNullOrEmpty(name) || s.name.Contains(name)))
 
                 .Select(obj => new ObjectsDTO
@@ -177,11 +177,11 @@ namespace eRekreacija.Services.Services
 
         public async Task<List<ObjectsDTO>> GetFavoritesObject(string userId)
         {
-            var objectId = await _rekreacijaContext.Set<tbl_Favorites>().Where(s => s.user_id == userId).Select(s => s.object_id).ToListAsync();
+            var objectId = await _identityContext.Set<tbl_Favorites>().Where(s => s.user_id == userId).Select(s => s.object_id).ToListAsync();
 
-            var objects = await _rekreacijaContext.Set<tbl_Objects>().Where(s => objectId.Contains(s.id)).Include(s => s.Reviews).ToListAsync();
+            var objects = await _identityContext.Set<tbl_Objects>().Where(s => objectId.Contains(s.id)).Include(s => s.Reviews).ToListAsync();
 
-            var objectsDTO = await _rekreacijaContext.Set<tbl_Objects>()
+            var objectsDTO = await _identityContext.Set<tbl_Objects>()
                 .Where(s => objectId.Contains(s.id))
             .Include(s => s.ObjectSportCategory)
             .Select(obj => new ObjectsDTO
@@ -203,7 +203,7 @@ namespace eRekreacija.Services.Services
 
         public override async Task<List<ObjectsDTO>> Get()
         {
-            var objectsDTO = await _rekreacijaContext.Set<tbl_Objects>()
+            var objectsDTO = await _identityContext.Set<tbl_Objects>()
                .Select(obj => new ObjectsDTO
                {
                    id = obj.id,
@@ -230,20 +230,20 @@ namespace eRekreacija.Services.Services
         {
             lock (isLocked)
             {
-                var reviews = _rekreacijaContext.Set<tbl_Review>().ToList();
-                var appointments = _rekreacijaContext.Set<tbl_Appointment>().ToList();
-                var favorites = _rekreacijaContext.Set<tbl_Favorites>().ToList();
+                var reviews = _identityContext.Set<tbl_Review>().ToList();
+                var appointments = _identityContext.Set<tbl_Appointment>().ToList();
+                var favorites = _identityContext.Set<tbl_Favorites>().ToList();
 
                 if (reviews.Count < 10)
                 {
-                    var popularObjects = _rekreacijaContext.Set<tbl_Objects>()
+                    var popularObjects = _identityContext.Set<tbl_Objects>()
                         .OrderByDescending(o => o.Reviews.Count)
                         .Take(4)
                         .ToList();
 
                     if (popularObjects.Count == 0)
                     {
-                        popularObjects = _rekreacijaContext.Set<tbl_Objects>()
+                        popularObjects = _identityContext.Set<tbl_Objects>()
                             .OrderBy(o => Guid.NewGuid())
                             .Take(4)
                             .ToList();
@@ -326,7 +326,7 @@ namespace eRekreacija.Services.Services
 
                 if (!userGuidToInt.ContainsKey(userId))
                 {
-                    var fallbackObjects = _rekreacijaContext.Set<tbl_Objects>()
+                    var fallbackObjects = _identityContext.Set<tbl_Objects>()
                         .OrderByDescending(o => o.Reviews.Count)
                         .Take(4)
                         .ToList();
@@ -336,7 +336,7 @@ namespace eRekreacija.Services.Services
 
                 uint mappedUserId = userGuidToInt[userId];
 
-                var allObjects = _rekreacijaContext.Set<tbl_Objects>().ToList();
+                var allObjects = _identityContext.Set<tbl_Objects>().ToList();
 
                 var predictionEngine = mlContext.Model.CreatePredictionEngine<ProductEntry, Copurchase_prediction>(model);
 
@@ -386,9 +386,9 @@ namespace eRekreacija.Services.Services
 
         public async Task<List<ObjectsDTO>> GetRecentAppointments(string userId)
         {
-            var objectIds = await _rekreacijaContext.Set<tbl_Appointment>().Where(s => s.user_id == userId).OrderByDescending(s => s.appointment_date).Select(s => s.object_id).Distinct().ToListAsync();
+            var objectIds = await _identityContext.Set<tbl_Appointment>().Where(s => s.user_id == userId).OrderByDescending(s => s.appointment_date).Select(s => s.object_id).Distinct().ToListAsync();
 
-            var objects = await _rekreacijaContext.Set<tbl_Objects>().Where(s => objectIds.Contains(s.id)).Select(s => new ObjectsDTO
+            var objects = await _identityContext.Set<tbl_Objects>().Where(s => objectIds.Contains(s.id)).Select(s => new ObjectsDTO
             {
                 id = s.id,
                 name = s.name,
@@ -406,7 +406,7 @@ namespace eRekreacija.Services.Services
 
         public async Task<List<UserObjectCountDTO>> GetCountObjectPerUser()
         {
-            var objectCounts = await _rekreacijaContext.TblObject
+            var objectCounts = await _identityContext.TblObject
                                                 .GroupBy(o => o.user_id)
                                                 .Select(group => new
                                                 {

@@ -14,13 +14,13 @@ namespace eRekreacija.Services.Services
     {
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public ReviewService(RekreacijaContext rekreacijaContext, IMapper mapper, UserManager<ApplicationUser> userManager) : base(rekreacijaContext, mapper) {
+        public ReviewService(IdentityContext identityContext, IMapper mapper, UserManager<ApplicationUser> userManager) : base(identityContext, mapper) {
             _userManager = userManager;
         }
 
         public async Task<List<ReviewDTO>> GetReviewOfObject(int object_id)
         {
-            var reviews = await _rekreacijaContext.Set<tbl_Review>()
+            var reviews = await _identityContext.Set<tbl_Review>()
                 .Where(s => s.object_id == object_id)
                 .OrderByDescending(s => s.created_date)
                 .Take(6)
@@ -61,9 +61,9 @@ namespace eRekreacija.Services.Services
 
         public async Task<List<ReviewDTO>> GetReviewsForMyObjects(string userId)
         {
-            var objectsId = await _rekreacijaContext.Set<tbl_Objects>().Where(s => s.user_id == userId).Select(s => s.id).ToListAsync();
+            var objectsId = await _identityContext.Set<tbl_Objects>().Where(s => s.user_id == userId).Select(s => s.id).ToListAsync();
 
-            var reviews = await _rekreacijaContext.Set<tbl_Review>().Where(s => objectsId.Contains(s.object_id)).OrderByDescending(s => s.created_date)
+            var reviews = await _identityContext.Set<tbl_Review>().Where(s => objectsId.Contains(s.object_id)).OrderByDescending(s => s.created_date)
                 .Select(s => new ReviewDTO
                 {
                     id=s.id,

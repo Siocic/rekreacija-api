@@ -14,13 +14,13 @@ namespace eRekreacija.Services.Services
     {
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public NotificationService(RekreacijaContext rekreacijaContext,IMapper mapper, UserManager<ApplicationUser> userManager) : base(rekreacijaContext, mapper){
+        public NotificationService(IdentityContext identityContext,IMapper mapper, UserManager<ApplicationUser> userManager) : base(identityContext, mapper){
             _userManager = userManager;
         }
 
         public override async Task<List<NotificationDTO>> Get()
         {
-            var notifications = await _rekreacijaContext.Set<tbl_Notification>().OrderByDescending(s => s.created_date).Select(s => new NotificationDTO
+            var notifications = await _identityContext.Set<tbl_Notification>().OrderByDescending(s => s.created_date).Select(s => new NotificationDTO
             {
                 created_date=s.created_date,
                 name=s.name,
@@ -55,7 +55,7 @@ namespace eRekreacija.Services.Services
         {
             var user = _userManager.FindByIdAsync(userId);
 
-            var notification = await _rekreacijaContext.TblNotification.Where(s => s.user_id == userId).ToListAsync();
+            var notification = await _identityContext.TblNotification.Where(s => s.user_id == userId).ToListAsync();
 
             var notificationDTO = notification.Select(s=>new NotificationDTO
             {

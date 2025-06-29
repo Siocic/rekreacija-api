@@ -22,9 +22,6 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<IdentityContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("RekreacijaConnection")));
 
-builder.Services.AddDbContext<RekreacijaContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("RekreacijaConnection")));
-
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<IdentityContext>()
     .AddDefaultTokenProviders();
@@ -127,18 +124,16 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    var rekreacijContext = scope.ServiceProvider.GetRequiredService<RekreacijaContext>();
-    var dataContext = scope.ServiceProvider.GetRequiredService<IdentityContext>();
+    var identityContext = scope.ServiceProvider.GetRequiredService<IdentityContext>();
     try
     {
         //Migrate data
-        dataContext.Database.Migrate();
-        rekreacijContext.Database.Migrate();
+        identityContext.Database.Migrate();
 
         //Seed data
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-        await DatabaseSeeder.SeedAsync(userManager, roleManager, rekreacijContext);
+        await DatabaseSeeder.SeedAsync(userManager, roleManager, identityContext);
 
     }
     catch (Exception ex)
@@ -171,18 +166,5 @@ app.UseAuthorization();
 app.MapHub<ChatHub>("/chat");
 
 app.MapControllers();
-
-//Docker create migration
-//using (var scope = app.Services.CreateScope())
-//{
-//    var dataContext = scope.ServiceProvider.GetRequiredService<IdentityContext>();
-//    var rekreacijaContext = scope.ServiceProvider.GetService<RekreacijaContext>();
-//    //dataContext.Database.EnsureCreated();
-//    dataContext.Database.Migrate();
-//    rekreacijaContext.Database.Migrate();
-//    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-//    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-//    await DatabaseSeeder.SeedAsync(userManager, roleManager, rekreacijaContext);
-//}
 
 app.Run();

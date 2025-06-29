@@ -8,6 +8,6 @@ namespace eRekreacija.Services.Services
 {
     public class SportCategoryService : BaseService<tbl_SportCategory, SportCategoryDTO>, ISportCategoryService
     {
-        public SportCategoryService(RekreacijaContext rekreacijaContext,IMapper mapper):base(rekreacijaContext,mapper){}
+        public SportCategoryService(IdentityContext identityContext,IMapper mapper):base(identityContext, mapper){}
     }
 }

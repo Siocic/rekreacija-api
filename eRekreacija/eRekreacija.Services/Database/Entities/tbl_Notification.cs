@@ -8,6 +8,7 @@ namespace eRekreacija.Services.Database.Entities
         public string name { get; set; }
         public string description { get; set; }
         public DateTime created_date { get; set; }
+        public ApplicationUser User { get; set; }
         public string user_id { get; set; }    
     }
 }

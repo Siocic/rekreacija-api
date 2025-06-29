@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using eRekreacija.Services.Database.Context;
+﻿using eRekreacija.Services.Database.Context;
 using eRekreacija.Services.Database.Entities;
 using eRekreacijaAPI.DTOs;
 using eRekreacijaAPI.Services.Interfaces;
@@ -9,8 +8,8 @@ namespace eRekreacijaAPI.Services
 {
     public class HolidayService : IHolidayService
     {
-        private readonly RekreacijaContext _context;
-        public HolidayService(RekreacijaContext context)
+        private readonly IdentityContext _context;
+        public HolidayService(IdentityContext context)
         {
             _context = context;
         }

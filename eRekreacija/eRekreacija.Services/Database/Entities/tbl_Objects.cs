@@ -11,6 +11,7 @@ namespace eRekreacija.Services.Database.Entities
         public string city { get; set; }
         public string? description { get; set; }
         public float price { get; set; }
+        public ApplicationUser User { get; set; }
         public string user_id { get; set; }
         public string? ImagePath { get; set; }
         public ICollection<tbl_Appointment> Appointments { get; set; } = new List<tbl_Appointment>();

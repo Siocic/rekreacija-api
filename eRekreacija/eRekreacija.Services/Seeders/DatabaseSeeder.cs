@@ -8,7 +8,7 @@ namespace eRekreacija.Services.Seeders
 {
     public class DatabaseSeeder
     {
-        public static async Task SeedAsync(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, RekreacijaContext context)
+        public static async Task SeedAsync(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IdentityContext context)
         {
             await SeedSuperAdmin(userManager, roleManager);
             await SeedFizickoLice(userManager, roleManager);
@@ -148,7 +148,7 @@ namespace eRekreacija.Services.Seeders
                 }
             }
         }
-        private static async Task SeedSportCategories(RekreacijaContext context)
+        private static async Task SeedSportCategories(IdentityContext context)
         {
             var sport_categories = new List<tbl_SportCategory>
             {
@@ -168,7 +168,7 @@ namespace eRekreacija.Services.Seeders
             }
             await context.SaveChangesAsync();
         }
-        private static async Task SeedObjects(RekreacijaContext context)
+        private static async Task SeedObjects(IdentityContext context)
         {
             var objects = new List<tbl_Objects>
             {
@@ -188,7 +188,7 @@ namespace eRekreacija.Services.Seeders
             await connection.OpenAsync();
             var command = connection.CreateCommand();
 
-            command.CommandText = "SET IDENTITY_INSERT tbl_Objects ON";
+            command.CommandText = "SET IDENTITY_INSERT [Identity].[tbl_Objects] ON";
             await command.ExecuteNonQueryAsync();
 
             foreach (var obj in objects)
@@ -200,12 +200,12 @@ namespace eRekreacija.Services.Seeders
             }
             await context.SaveChangesAsync();
 
-            command.CommandText = "SET IDENTITY_INSERT tbl_Objects OFF";
+            command.CommandText = "SET IDENTITY_INSERT [Identity].[tbl_Objects] OFF";
             await command.ExecuteNonQueryAsync();
             await connection.CloseAsync();
 
         }
-        private static async Task SeedSportCategoriesObjects(RekreacijaContext context)
+        private static async Task SeedSportCategoriesObjects(IdentityContext context)
         {
             var sport_categoires_objects = new List<tbl_ObjectSportCategory>
             {
@@ -239,7 +239,7 @@ namespace eRekreacija.Services.Seeders
             }
             await context.SaveChangesAsync();
         }
-        private static async Task SeedReview(RekreacijaContext context)
+        private static async Task SeedReview(IdentityContext context)
         {
             var review = new List<tbl_Review>
             {
@@ -267,7 +267,7 @@ namespace eRekreacija.Services.Seeders
             await connection.OpenAsync();
             var command = connection.CreateCommand();
 
-            command.CommandText = "SET IDENTITY_INSERT tbl_Review ON";
+            command.CommandText = "SET IDENTITY_INSERT[Identity].[tbl_Review] ON";
             await command.ExecuteNonQueryAsync();
 
             foreach (var r in review)
@@ -279,11 +279,11 @@ namespace eRekreacija.Services.Seeders
             }
             await context.SaveChangesAsync();
 
-            command.CommandText = "SET IDENTITY_INSERT tbl_Review OFF";
+            command.CommandText = "SET IDENTITY_INSERT [Identity].[tbl_Review] OFF";
             await command.ExecuteNonQueryAsync();
             await connection.CloseAsync();
         }
-        private static async Task SeedNotification(RekreacijaContext context)
+        private static async Task SeedNotification(IdentityContext context)
         {
             var notification = new List<tbl_Notification>
             {
@@ -297,7 +297,7 @@ namespace eRekreacija.Services.Seeders
             await connection.OpenAsync();
             var command = connection.CreateCommand();
 
-            command.CommandText = "SET IDENTITY_INSERT tbl_Notification ON";
+            command.CommandText = "SET IDENTITY_INSERT [Identity].[tbl_Notification] ON";
             await command.ExecuteNonQueryAsync();
 
             foreach (var n in notification)
@@ -309,11 +309,11 @@ namespace eRekreacija.Services.Seeders
             }
             await context.SaveChangesAsync();
 
-            command.CommandText = "SET IDENTITY_INSERT tbl_Notification OFF";
+            command.CommandText = "SET IDENTITY_INSERT [Identity].[tbl_Notification] OFF";
             await command.ExecuteNonQueryAsync();
             await connection.CloseAsync();
         }
-        private static async Task SeedAppointments(RekreacijaContext context)
+        private static async Task SeedAppointments(IdentityContext context)
         {
             var appointments = new List<tbl_Appointment>
             {
@@ -359,7 +359,7 @@ namespace eRekreacija.Services.Seeders
             await connection.OpenAsync();
             var command = connection.CreateCommand();
 
-            command.CommandText = "SET IDENTITY_INSERT tbl_Appointment ON";
+            command.CommandText = "SET IDENTITY_INSERT [Identity].[tbl_Appointment] ON";
             await command.ExecuteNonQueryAsync();
 
             foreach (var n in appointments)
@@ -371,11 +371,11 @@ namespace eRekreacija.Services.Seeders
             }
             await context.SaveChangesAsync();
 
-            command.CommandText = "SET IDENTITY_INSERT tbl_Appointment OFF";
+            command.CommandText = "SET IDENTITY_INSERT [Identity].[tbl_Appointment] OFF";
             await command.ExecuteNonQueryAsync();
             await connection.CloseAsync();
         }
-        private static async Task SeedPayments(RekreacijaContext context)
+        private static async Task SeedPayments(IdentityContext context)
         {
             var payments = new List<tbl_Payment>
             {
@@ -420,7 +420,7 @@ namespace eRekreacija.Services.Seeders
             await connection.OpenAsync();
             var command = connection.CreateCommand();
 
-            command.CommandText = "SET IDENTITY_INSERT tbl_Payment ON";
+            command.CommandText = "SET IDENTITY_INSERT [Identity].[tbl_Payment] ON";
             await command.ExecuteNonQueryAsync();
 
             foreach (var n in payments)
@@ -432,11 +432,11 @@ namespace eRekreacija.Services.Seeders
             }
             await context.SaveChangesAsync();
 
-            command.CommandText = "SET IDENTITY_INSERT tbl_Payment OFF";
+            command.CommandText = "SET IDENTITY_INSERT [Identity].[tbl_Payment] OFF";
             await command.ExecuteNonQueryAsync();
             await connection.CloseAsync();
         }
-        private static async Task SeedFavorites(RekreacijaContext context)
+        private static async Task SeedFavorites(IdentityContext context)
         {
             var favorites = new List<tbl_Favorites>
             {
@@ -463,7 +463,7 @@ namespace eRekreacija.Services.Seeders
             }
             await context.SaveChangesAsync();
         }
-        private static async Task SeedHolidays(RekreacijaContext context)
+        private static async Task SeedHolidays(IdentityContext context)
         {
             var holiday = new List<tbl_Holiday>
             {
@@ -482,7 +482,7 @@ namespace eRekreacija.Services.Seeders
             await connection.OpenAsync();
             var command = connection.CreateCommand();
 
-            command.CommandText = "SET IDENTITY_INSERT tbl_Holiday ON";
+            command.CommandText = "SET IDENTITY_INSERT [Identity].[tbl_Holiday] ON";
             await command.ExecuteNonQueryAsync();
 
             foreach (var h in holiday)
@@ -494,11 +494,11 @@ namespace eRekreacija.Services.Seeders
             }
             await context.SaveChangesAsync();
 
-            command.CommandText = "SET IDENTITY_INSERT tbl_Holiday OFF";
+            command.CommandText = "SET IDENTITY_INSERT [Identity].[tbl_Holiday] OFF";
             await command.ExecuteNonQueryAsync();
             await connection.CloseAsync();
         }
-        private static async Task SeedObjectHoliday(RekreacijaContext context)
+        private static async Task SeedObjectHoliday(IdentityContext context)
         {
             var object_holiday = new List<tbl_ObjectHoliday>
             {
@@ -575,7 +575,7 @@ namespace eRekreacija.Services.Seeders
             }
             await context.SaveChangesAsync();
         }
-        private static async Task SeedChatMessages(RekreacijaContext context)
+        private static async Task SeedChatMessages(IdentityContext context)
         {
             var chat_meesages = new List<tbl_ChatMessage>
             {
@@ -594,7 +594,7 @@ namespace eRekreacija.Services.Seeders
             await connection.OpenAsync();
             var command = connection.CreateCommand();
 
-            command.CommandText = "SET IDENTITY_INSERT tbl_ChatMessage ON";
+            command.CommandText = "SET IDENTITY_INSERT [Identity].[tbl_ChatMessage] ON";
             await command.ExecuteNonQueryAsync();
 
             foreach (var mess in chat_meesages)
@@ -606,7 +606,7 @@ namespace eRekreacija.Services.Seeders
             }
             await context.SaveChangesAsync();
 
-            command.CommandText = "SET IDENTITY_INSERT tbl_ChatMessage OFF";
+            command.CommandText = "SET IDENTITY_INSERT [Identity].[tbl_ChatMessage] OFF";
             await command.ExecuteNonQueryAsync();
             await connection.CloseAsync();
         }

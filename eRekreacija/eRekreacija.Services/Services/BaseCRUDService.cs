@@ -8,7 +8,7 @@ namespace eRekreacija.Services.Services
         where TModel : class
         where TModelDTO : class
     {
-        public BaseCRUDService(RekreacijaContext rekreacijaContext, IMapper mapper) : base(rekreacijaContext, mapper) { }
+        public BaseCRUDService(IdentityContext identityContext, IMapper mapper) : base(identityContext, mapper) { }
 
         public virtual async Task BeforeInsert(TModel db, TInsert insert) { }
         public virtual async Task BeforeUpdate(TModel db, TUpdate insert) { }
@@ -20,9 +20,9 @@ namespace eRekreacija.Services.Services
         {
             var entity = _mapper.Map<TModel>(model);
             await BeforeImageInsert(entity, model);
-            await _rekreacijaContext.Set<TModel>().AddAsync(entity);
+            await _identityContext.Set<TModel>().AddAsync(entity);
 
-            await _rekreacijaContext.SaveChangesAsync();
+            await _identityContext.SaveChangesAsync();
             await BeforeInsert(entity, model);
 
             return _mapper.Map<TModelDTO>(entity);
@@ -32,14 +32,14 @@ namespace eRekreacija.Services.Services
         {
             try
             {
-                var entity = await _rekreacijaContext.Set<TModel>().FindAsync(id);
+                var entity = await _identityContext.Set<TModel>().FindAsync(id);
                 if (entity == null)
                     throw new Exception($"Enttity with ID:{id} not found");
 
                 _mapper.Map(model, entity);
                 await BeforeImageUpdate(entity, model);
 
-                await _rekreacijaContext.SaveChangesAsync();
+                await _identityContext.SaveChangesAsync();
                 await BeforeUpdate(entity, model);
 
                 return _mapper.Map<TModelDTO>(entity);
@@ -53,13 +53,13 @@ namespace eRekreacija.Services.Services
         }
         public virtual async Task<bool> Delete(int id)
         {
-            var entity = await _rekreacijaContext.Set<TModel>().FindAsync(id);
+            var entity = await _identityContext.Set<TModel>().FindAsync(id);
             if (entity == null)
                 throw new Exception($"Enttity with ID:{id} not found");
 
             await BeforeDelete(entity);
-            _rekreacijaContext.Set<TModel>().Remove(entity);
-            await _rekreacijaContext.SaveChangesAsync();
+            _identityContext.Set<TModel>().Remove(entity);
+            await _identityContext.SaveChangesAsync();
             return true;
         }
 

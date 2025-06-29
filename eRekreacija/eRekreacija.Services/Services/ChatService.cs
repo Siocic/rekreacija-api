@@ -1,25 +1,20 @@
 ﻿using AutoMapper;
-using eRekreacija.Models.DTOs;
-using eRekreacija.Models.Models;
 using eRekreacija.Services.Database.Context;
 using eRekreacija.Services.Database.Entities;
 using eRekreacija.Services.Services;
-using Microsoft.AspNetCore.Http.Features.Authentication;
 using Microsoft.EntityFrameworkCore;
 
 public class ChatService : BaseCRUDService<tbl_ChatMessage, ChatMessageDTO, ChatMessageDTO, object>, IChatService
 {
-    private readonly RekreacijaContext _rekreacijaContext;
     protected readonly IdentityContext _identityContext;
 
-    public ChatService(RekreacijaContext rekreacijaContext, IdentityContext identityContext, IMapper mapper) : base(rekreacijaContext, mapper) {
-        _rekreacijaContext = rekreacijaContext;
+    public ChatService(IdentityContext identityContext, IMapper mapper) : base(identityContext, mapper) {
         _identityContext = identityContext;
     }
 
     public async Task<IEnumerable<ChatMessageDTO>> GetMessagesAsync(string user1Id, string user2Id)
     {
-        var messages = await _rekreacijaContext.TblChatMessages
+        var messages = await _identityContext.TblChatMessages
             .Where(m =>
                 (m.SenderId == user1Id && m.RecipientId == user2Id) ||
                 (m.SenderId == user2Id && m.RecipientId == user1Id))
@@ -30,7 +25,7 @@ public class ChatService : BaseCRUDService<tbl_ChatMessage, ChatMessageDTO, Chat
     }
     public async Task<List<UserConversationDTO>> GetUserConversationsAsync(string userId, bool hall)
     {
-        var messages = await _rekreacijaContext.TblChatMessages
+        var messages = await _identityContext.TblChatMessages
             .Where(m => m.SenderId == userId || m.RecipientId == userId)
             .OrderByDescending(m => m.Timestamp)
             .ToListAsync();
@@ -44,7 +39,7 @@ public class ChatService : BaseCRUDService<tbl_ChatMessage, ChatMessageDTO, Chat
 
         if (hall)
         {
-            nameMap = await _rekreacijaContext.TblObject
+            nameMap = await _identityContext.TblObject
                 .Where(o => conversationUserIds.Contains(o.user_id))
                 .ToDictionaryAsync(o => o.user_id, o => o.name);
         }
@@ -77,6 +72,4 @@ public class ChatService : BaseCRUDService<tbl_ChatMessage, ChatMessageDTO, Chat
 
         return conversations;
     }
-
-
 }

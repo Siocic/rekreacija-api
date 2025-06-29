@@ -10,21 +10,21 @@ namespace eRekreacija.Services.Services
 {
     public class FavoritesService : BaseCRUDService<tbl_Favorites, FavoritesDTO, FavoritesInsertRequest, FavoritesUpdateRequest>, IFavoritesService
     {
-        public FavoritesService(RekreacijaContext rekreacijaContext, IMapper mapper) : base(rekreacijaContext, mapper) { }
+        public FavoritesService(IdentityContext identityContext, IMapper mapper) : base(identityContext, mapper) { }
 
         public override async Task<FavoritesDTO> Insert(FavoritesInsertRequest model)
         {
-            var checkIsAlreadyFavorite = await _rekreacijaContext.Set<tbl_Favorites>().FirstOrDefaultAsync(s => s.user_id == model.user_id && s.object_id == model.object_id);
+            var checkIsAlreadyFavorite = await _identityContext.Set<tbl_Favorites>().FirstOrDefaultAsync(s => s.user_id == model.user_id && s.object_id == model.object_id);
             if (checkIsAlreadyFavorite != null)
             {
-                _rekreacijaContext.Remove(checkIsAlreadyFavorite);
-                await _rekreacijaContext.SaveChangesAsync();
+                _identityContext.Remove(checkIsAlreadyFavorite);
+                await _identityContext.SaveChangesAsync();
                 return null;
             }
 
             var entity = _mapper.Map<tbl_Favorites>(model);
-            await _rekreacijaContext.Set<tbl_Favorites>().AddAsync(entity);
-            await _rekreacijaContext.SaveChangesAsync();
+            await _identityContext.Set<tbl_Favorites>().AddAsync(entity);
+            await _identityContext.SaveChangesAsync();
             return _mapper.Map<FavoritesDTO>(entity);
 
         }

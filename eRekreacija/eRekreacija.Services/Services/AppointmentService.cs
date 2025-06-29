@@ -22,7 +22,7 @@ namespace eRekreacija.Services.Services
         private readonly string _password = Environment.GetEnvironmentVariable("RabbitMQ_Password") ?? "guest";
         private readonly string _virtualhost = Environment.GetEnvironmentVariable("RabbitMQ_Virtualhost") ?? "/";
 
-        public AppointmentService(RekreacijaContext rekreacijaContext, IMapper mapper, UserManager<ApplicationUser> userManager) : base(rekreacijaContext, mapper)
+        public AppointmentService(IdentityContext identityContext, IMapper mapper, UserManager<ApplicationUser> userManager) : base(identityContext, mapper)
         {
             _userManager = userManager;
 
@@ -44,8 +44,8 @@ namespace eRekreacija.Services.Services
         public override async Task<AppointmentDTO> Insert(AppointmentInsertRequest model)
         {
             var entity = _mapper.Map<tbl_Appointment>(model);
-            await _rekreacijaContext.Set<tbl_Appointment>().AddAsync(entity);
-            await _rekreacijaContext.SaveChangesAsync();
+            await _identityContext.Set<tbl_Appointment>().AddAsync(entity);
+            await _identityContext.SaveChangesAsync();
 
             await BeforeInsert(entity, model);
 
@@ -83,16 +83,16 @@ namespace eRekreacija.Services.Services
                 amount = insert.amount
             };
 
-            await _rekreacijaContext.AddAsync(payment);
-            await _rekreacijaContext.SaveChangesAsync();
+            await _identityContext.AddAsync(payment);
+            await _identityContext.SaveChangesAsync();
             await base.BeforeInsert(db, insert);
         }
 
         public async Task<List<AppointmentDTO>> GetAppointmentOfObject(string userId)
         {
-            var objectIds = await _rekreacijaContext.Set<tbl_Objects>().Where(s => s.user_id == userId).Select(s => s.id).ToListAsync();
+            var objectIds = await _identityContext.Set<tbl_Objects>().Where(s => s.user_id == userId).Select(s => s.id).ToListAsync();
 
-            var appointments = await _rekreacijaContext.Set<tbl_Appointment>().Where(s => objectIds.Contains(s.object_id) && s.is_approved == false)
+            var appointments = await _identityContext.Set<tbl_Appointment>().Where(s => objectIds.Contains(s.object_id) && s.is_approved == false)
                 .Select(s => new AppointmentDTO
                 {
                     id = s.id,
@@ -103,7 +103,7 @@ namespace eRekreacija.Services.Services
                     user_id = s.user_id
                 }).ToListAsync();
 
-            var objects = await _rekreacijaContext.Set<tbl_Objects>().Where(o => objectIds.Contains(o.id))
+            var objects = await _identityContext.Set<tbl_Objects>().Where(o => objectIds.Contains(o.id))
             .Select(o => new ObjectsDTO
             {
                 id = o.id,
@@ -136,9 +136,9 @@ namespace eRekreacija.Services.Services
 
         public async Task<List<AppointmentDTO>> GetApprovedAppointmentOfObject(string userId)
         {
-            var objectIds = await _rekreacijaContext.Set<tbl_Objects>().Where(s => s.user_id == userId).Select(s => s.id).ToListAsync();
+            var objectIds = await _identityContext.Set<tbl_Objects>().Where(s => s.user_id == userId).Select(s => s.id).ToListAsync();
 
-            var appointments = await _rekreacijaContext.Set<tbl_Appointment>().Where(s => objectIds.Contains(s.object_id) && s.is_approved == true)
+            var appointments = await _identityContext.Set<tbl_Appointment>().Where(s => objectIds.Contains(s.object_id) && s.is_approved == true)
                 .Select(s => new AppointmentDTO
                 {
                     id = s.id,
@@ -150,7 +150,7 @@ namespace eRekreacija.Services.Services
                     is_approved = s.is_approved
                 }).ToListAsync();
 
-            var objects = await _rekreacijaContext.Set<tbl_Objects>().Where(o => objectIds.Contains(o.id))
+            var objects = await _identityContext.Set<tbl_Objects>().Where(o => objectIds.Contains(o.id))
             .Select(o => new ObjectsDTO
             {
                 id = o.id,
@@ -183,11 +183,11 @@ namespace eRekreacija.Services.Services
 
         public async Task<bool> ApproveAppointment(int id)
         {
-            var existing_appointment = await _rekreacijaContext.Set<tbl_Appointment>().Where(a => a.id == id).FirstOrDefaultAsync();
+            var existing_appointment = await _identityContext.Set<tbl_Appointment>().Where(a => a.id == id).FirstOrDefaultAsync();
             if (existing_appointment != null)
             {
                 existing_appointment.is_approved = true;
-                await _rekreacijaContext.SaveChangesAsync();
+                await _identityContext.SaveChangesAsync();
 
                 var user = await _userManager.FindByIdAsync(existing_appointment.user_id);
 
@@ -219,11 +219,11 @@ namespace eRekreacija.Services.Services
 
         public override async Task<bool> Delete(int id)
         {
-            var existing_appointment = await _rekreacijaContext.Set<tbl_Appointment>().Where(a => a.id == id).FirstOrDefaultAsync();
+            var existing_appointment = await _identityContext.Set<tbl_Appointment>().Where(a => a.id == id).FirstOrDefaultAsync();
             if (existing_appointment != null)
             {
-                _rekreacijaContext.Remove(existing_appointment);
-                await _rekreacijaContext.SaveChangesAsync();
+                _identityContext.Remove(existing_appointment);
+                await _identityContext.SaveChangesAsync();
 
                 var user = await _userManager.FindByIdAsync(existing_appointment.user_id);
 
@@ -255,9 +255,9 @@ namespace eRekreacija.Services.Services
 
         public async Task<List<MyClientsDTO>> GetMyClients(string userId)
         {
-            var objectsIds = await _rekreacijaContext.Set<tbl_Objects>().Where(s => s.user_id == userId).Select(s => s.id).ToListAsync();
+            var objectsIds = await _identityContext.Set<tbl_Objects>().Where(s => s.user_id == userId).Select(s => s.id).ToListAsync();
 
-            var appointmnetsUser = _rekreacijaContext.Set<tbl_Appointment>().Where(s => objectsIds.Contains(s.object_id) && s.is_approved == true).ToList();
+            var appointmnetsUser = _identityContext.Set<tbl_Appointment>().Where(s => objectsIds.Contains(s.object_id) && s.is_approved == true).ToList();
 
             var appointmentStats = appointmnetsUser.GroupBy(a => a.user_id).ToDictionary(g => g.Key, g => new
             {
@@ -291,11 +291,11 @@ namespace eRekreacija.Services.Services
 
         public async Task<List<MyClientPayments>> GetMyClientPayments(string userId)
         {
-            var objectsIds = await _rekreacijaContext.Set<tbl_Objects>().Where(s => s.user_id == userId).Select(s => s.id).ToListAsync();
+            var objectsIds = await _identityContext.Set<tbl_Objects>().Where(s => s.user_id == userId).Select(s => s.id).ToListAsync();
 
-            var appointmnetsIds = _rekreacijaContext.Set<tbl_Appointment>().Where(s => objectsIds.Contains(s.object_id) && s.is_approved == true).Select(s => s.id).ToList();
+            var appointmnetsIds = _identityContext.Set<tbl_Appointment>().Where(s => objectsIds.Contains(s.object_id) && s.is_approved == true).Select(s => s.id).ToList();
 
-            var payments = await _rekreacijaContext.Set<tbl_Payment>().Where(s => appointmnetsIds.Contains(s.appointment_id))
+            var payments = await _identityContext.Set<tbl_Payment>().Where(s => appointmnetsIds.Contains(s.appointment_id))
                 .Select(s => new MyClientPayments
                 {
                     Amount = s.amount,
@@ -306,7 +306,7 @@ namespace eRekreacija.Services.Services
                 .ToListAsync();
 
             var objectIds = payments.Select(s => s.object_id).Distinct().ToList();
-            var objects = await _rekreacijaContext.Set<tbl_Objects>().Where(s => objectIds.Contains(s.id)).Select(s => new
+            var objects = await _identityContext.Set<tbl_Objects>().Where(s => objectIds.Contains(s.id)).Select(s => new
             {
                 Id = s.id,
                 ObjectName = s.name
@@ -343,7 +343,7 @@ namespace eRekreacija.Services.Services
 
         public async Task<List<MyReservationDTO>> GetMyReservation(string userId)
         {
-            var reservation = await _rekreacijaContext.Set<tbl_Appointment>().Where(s => s.user_id == userId && s.appointment_date >= DateTime.Now).Select(s => new MyReservationDTO
+            var reservation = await _identityContext.Set<tbl_Appointment>().Where(s => s.user_id == userId && s.appointment_date >= DateTime.Now).Select(s => new MyReservationDTO
             {
                 AppointmentDate = s.appointment_date,
                 AppointmentStartDate = s.start_time,
@@ -355,7 +355,7 @@ namespace eRekreacija.Services.Services
             }).ToListAsync();
 
             var objectIds = reservation.Select(s => s.object_id).Distinct().ToList();
-            var objects = await _rekreacijaContext.Set<tbl_Objects>().Where(s => objectIds.Contains(s.id)).Select(s => new
+            var objects = await _identityContext.Set<tbl_Objects>().Where(s => objectIds.Contains(s.id)).Select(s => new
             {
                 Id = s.id,
                 ObjectName = s.name,
@@ -378,7 +378,7 @@ namespace eRekreacija.Services.Services
         }
         public async Task<List<MyReservationDTO>> GetMyReservationHistory(string userId)
         {
-            var reservation = await _rekreacijaContext.Set<tbl_Appointment>().Where(s => s.user_id == userId && s.is_approved==true &&s.appointment_date <= DateTime.Now).Select(s => new MyReservationDTO
+            var reservation = await _identityContext.Set<tbl_Appointment>().Where(s => s.user_id == userId && s.is_approved==true &&s.appointment_date <= DateTime.Now).Select(s => new MyReservationDTO
             {
                 AppointmentDate = s.appointment_date,
                 AppointmentStartDate = s.start_time,
@@ -390,7 +390,7 @@ namespace eRekreacija.Services.Services
             }).ToListAsync();
 
             var objectIds = reservation.Select(s => s.object_id).Distinct().ToList();
-            var objects = await _rekreacijaContext.Set<tbl_Objects>().Where(s => objectIds.Contains(s.id)).Select(s => new
+            var objects = await _identityContext.Set<tbl_Objects>().Where(s => objectIds.Contains(s.id)).Select(s => new
             {
                 Id = s.id,
                 ObjectName = s.name,
@@ -414,7 +414,7 @@ namespace eRekreacija.Services.Services
 
         public async Task<bool> GetReservedTimes(int objectId, DateTime? startTime, DateTime? endTime)
         {
-            var reservation = await _rekreacijaContext.TblAppointment.Where(a => a.object_id == objectId && (a.start_time < endTime && a.end_time > startTime)).ToListAsync();
+            var reservation = await _identityContext.TblAppointment.Where(a => a.object_id == objectId && (a.start_time < endTime && a.end_time > startTime)).ToListAsync();
             if (reservation.Any())
                 return true;
             return false;
