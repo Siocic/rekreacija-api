@@ -31,11 +31,18 @@ namespace eRekreacija.Services.Services
                    ? "defaultobject"
                    : new string(insert.name.Where(char.IsLetterOrDigit).ToArray()).ToLower();
 
+            string imagesDir = Path.Combine(_host.WebRootPath, "images");
             string fileName = $"{cleanedName}.jpg";
-            string filePath = Path.Combine(_host.WebRootPath, "images", fileName);
+            string filePath = Path.Combine(imagesDir, fileName);
+
+            if (!Directory.Exists(imagesDir))
+                Directory.CreateDirectory(imagesDir);
+
+            if (Directory.Exists(filePath))
+                throw new IOException($"Cannot create file: A directory with the name '{filePath}' already exists.");
 
             await System.IO.File.WriteAllBytesAsync(filePath, insert.ObjectImage);
-            entity.ImagePath = $"/images/{fileName}";
+            entity.ImagePath = $"images/{fileName}";
 
             await base.BeforeImageInsert(entity, insert);
         }
@@ -51,8 +58,15 @@ namespace eRekreacija.Services.Services
                ? "defaultobject"
                : new string(update.name.Where(char.IsLetterOrDigit).ToArray()).ToLower();
 
+                string imagesDir = Path.Combine(_host.WebRootPath, "images");
                 string fileName = $"{cleanedName}.jpg";
                 string filePath = Path.Combine(_host.WebRootPath, "images", fileName);
+
+                if (!Directory.Exists(imagesDir))
+                    Directory.CreateDirectory(imagesDir);
+
+                if (Directory.Exists(filePath))
+                    throw new IOException($"Cannot create file: A directory with the name '{filePath}' already exists.");
 
                 await System.IO.File.WriteAllBytesAsync(filePath, update.ObjectImage);
                 entity.ImagePath = $"/images/{fileName}";
@@ -130,7 +144,7 @@ namespace eRekreacija.Services.Services
         }
         public async Task<List<ObjectsDTO>> GetAllObjectsOfUser(string userId)
         {
-            var user = _userManager.FindByIdAsync(userId);
+            //var user = await _userManager.FindByIdAsync(userId);
 
             var objects = await _identityContext.TblObject.Where(s => s.user_id == userId).OrderByDescending(s => s.created_date).Include(s => s.ObjectSportCategory).ToListAsync();
 

@@ -23,6 +23,7 @@ services:
         restart: unless-stopped
         build:
           context: .
+        user: root
         environment:
           - JWT_KEY=${JWT_KEY}
           - ConnectionStrings__RekreacijaConnection=Server=${SQL_HOST}, 1433;Database=${SQL_DATABASE};User Id=${SQL_USER};Password=${SQL_PASSWORD};TrustServerCertificate=True
@@ -31,7 +32,9 @@ services:
           - RabbitMQ_Username=${RABBITMQ_USER} 
           - RabbitMQ_Password=${RABBITMQ_PASSWORD} 
           - RabbitMQ_Virtualhost=/
-          - RABBITMQ_PORT=5672
+          - RABBITMQ_PORT=5672         
+        volumes:
+          - ./eRekreacijaAPI/wwwroot/images:/app/wwwroot/images
         ports:
           - 7271:7271
         networks:

@@ -53,7 +53,7 @@ namespace eRekreacija.Services.Services
 
         public async Task<List<NotificationDTO>> GetAllNotificatiosOfUser(string userId)
         {
-            var user = _userManager.FindByIdAsync(userId);
+            //var user = _userManager.FindByIdAsync(userId);
 
             var notification = await _identityContext.TblNotification.Where(s => s.user_id == userId).ToListAsync();
 
