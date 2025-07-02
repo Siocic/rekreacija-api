@@ -50,9 +50,12 @@ namespace eRekreacija.Services.Services
         {
             if (update.ObjectImage != null)
             {
-                string imagePath = Path.Combine(_host.WebRootPath, entity.ImagePath.TrimStart('/'));
-                if (System.IO.File.Exists(imagePath))
-                    System.IO.File.Delete(imagePath);
+                if (!string.IsNullOrWhiteSpace(entity.ImagePath))
+                {
+                    string imagePath = Path.Combine(_host.WebRootPath, entity.ImagePath.TrimStart('/'));
+                    if (System.IO.File.Exists(imagePath))
+                        System.IO.File.Delete(imagePath);
+                }
 
                 string cleanedName = string.IsNullOrWhiteSpace(update.name)
                ? "defaultobject"
