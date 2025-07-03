@@ -344,11 +344,26 @@ namespace eRekreacija.Services.Services
                 if (!userGuidToInt.ContainsKey(userId))
                 {
                     var fallbackObjects = _identityContext.Set<tbl_Objects>()
+                        .Include(o => o.Reviews)
                         .OrderByDescending(o => o.Reviews.Count)
                         .Take(4)
                         .ToList();
 
-                    return _mapper.Map<List<ObjectsDTO>>(fallbackObjects);
+                    return fallbackObjects.Select(o=>new ObjectsDTO
+                    {
+                        id = o.id,
+                        name = o.name,
+                        address = o.address,
+                        city = o.city,
+                        description = o.description,
+                        ImagePath = o.ImagePath,
+                        price = o.price,
+                        rating = o.Reviews.Any() ? o.Reviews.Average(r => r.rating) : 0,
+                        user_id = o.user_id,
+
+                    }).ToList();
+
+                   // return _mapper.Map<List<ObjectsDTO>>(fallbackObjects);
                 }
 
                 uint mappedUserId = userGuidToInt[userId];
