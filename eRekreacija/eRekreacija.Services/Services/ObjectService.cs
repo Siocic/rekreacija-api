@@ -72,7 +72,7 @@ namespace eRekreacija.Services.Services
                     throw new IOException($"Cannot create file: A directory with the name '{filePath}' already exists.");
 
                 await System.IO.File.WriteAllBytesAsync(filePath, update.ObjectImage);
-                entity.ImagePath = $"/images/{fileName}";
+                entity.ImagePath = $"images/{fileName}";
 
                 await base.BeforeImageUpdate(entity, update);
             }
