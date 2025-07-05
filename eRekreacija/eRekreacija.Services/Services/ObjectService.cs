@@ -4,6 +4,7 @@ using eRekreacija.Models.Models;
 using eRekreacija.Services.Database;
 using eRekreacija.Services.Database.Context;
 using eRekreacija.Services.Database.Entities;
+using eRekreacija.Services.Database.Helper;
 using eRekreacija.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -148,11 +149,14 @@ namespace eRekreacija.Services.Services
         }
         public override async Task BeforeDelete(tbl_Objects db)
         {
-            string imagePath = Path.Combine(_host.WebRootPath, db.ImagePath.TrimStart('/'));
-            if (System.IO.File.Exists(imagePath))
-                System.IO.File.Delete(imagePath);
+            if (!string.IsNullOrWhiteSpace(db.ImagePath))
+            {
+                string imagePath = Path.Combine(_host.WebRootPath, db.ImagePath.TrimStart('/'));
+                if (System.IO.File.Exists(imagePath))
+                    System.IO.File.Delete(imagePath);
 
-            await base.BeforeDelete(db);
+                await base.BeforeDelete(db);
+            }           
         }
         public async Task<List<ObjectsDTO>> GetAllObjectsOfUser(string userId)
         {
