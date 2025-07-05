@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Trainers;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace eRekreacija.Services.Services
 {
@@ -27,24 +28,32 @@ namespace eRekreacija.Services.Services
 
         public override async Task BeforeImageInsert(tbl_Objects entity, ObjectInsertRequest insert)
         {
-            string cleanedName = string.IsNullOrWhiteSpace(insert.name)
-                   ? "defaultobject"
-                   : new string(insert.name.Where(char.IsLetterOrDigit).ToArray()).ToLower();
+            if (insert.ObjectImage != null)
+            {
+                string cleanedName = string.IsNullOrWhiteSpace(insert.name)
+                  ? "defaultobject"
+                  : new string(insert.name.Where(char.IsLetterOrDigit).ToArray()).ToLower();
 
-            string imagesDir = Path.Combine(_host.WebRootPath, "images");
-            string fileName = $"{cleanedName}.jpg";
-            string filePath = Path.Combine(imagesDir, fileName);
+                string imagesDir = Path.Combine(_host.WebRootPath, "images");
+                string fileName = $"{cleanedName}.jpg";
+                string filePath = Path.Combine(imagesDir, fileName);
 
-            if (!Directory.Exists(imagesDir))
-                Directory.CreateDirectory(imagesDir);
+                if (!Directory.Exists(imagesDir))
+                    Directory.CreateDirectory(imagesDir);
 
-            if (Directory.Exists(filePath))
-                throw new IOException($"Cannot create file: A directory with the name '{filePath}' already exists.");
+                if (Directory.Exists(filePath))
+                    throw new IOException($"Cannot create file: A directory with the name '{filePath}' already exists.");
 
-            await System.IO.File.WriteAllBytesAsync(filePath, insert.ObjectImage);
-            entity.ImagePath = $"images/{fileName}";
+                await System.IO.File.WriteAllBytesAsync(filePath, insert.ObjectImage);
+                entity.ImagePath = $"images/{fileName}";
 
-            await base.BeforeImageInsert(entity, insert);
+                await base.BeforeImageInsert(entity, insert);
+            }
+            else
+            {
+                await base.BeforeImageInsert(entity, insert);
+            }
+
         }
         public override async Task BeforeImageUpdate(tbl_Objects entity, ObjectUpdateRequest update)
         {
@@ -349,7 +358,7 @@ namespace eRekreacija.Services.Services
                         .Take(4)
                         .ToList();
 
-                    return fallbackObjects.Select(o=>new ObjectsDTO
+                    return fallbackObjects.Select(o => new ObjectsDTO
                     {
                         id = o.id,
                         name = o.name,
@@ -363,7 +372,7 @@ namespace eRekreacija.Services.Services
 
                     }).ToList();
 
-                   // return _mapper.Map<List<ObjectsDTO>>(fallbackObjects);
+                    // return _mapper.Map<List<ObjectsDTO>>(fallbackObjects);
                 }
 
                 uint mappedUserId = userGuidToInt[userId];
